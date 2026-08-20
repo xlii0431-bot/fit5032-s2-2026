@@ -45,6 +45,24 @@ main {
   background: #fff;
 }
 
+.feature-section {
+  background: #fff;
+}
+
+.feature-card {
+  border: 1px solid #d9e6dc;
+  border-top: 4px solid #198754;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-0.25rem);
+}
+
+.feature-card .card-title {
+  color: #205c36;
+}
+
 .recycling-card {
   border-color: #d9e6dc;
 }

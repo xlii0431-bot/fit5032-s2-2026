@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-md navbar-dark bg-success" aria-label="Main navigation">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success" aria-label="Main navigation">
     <div class="container">
       <RouterLink class="navbar-brand fw-semibold" to="/">
         GreenLoop Melbourne
@@ -26,8 +26,9 @@ import { RouterLink } from 'vue-router'
             <RouterLink class="nav-link" to="/recycling-guide">Recycling Guide</RouterLink>
           </li>
           <li class="nav-item">
-            <RouterLink class="nav-link" to="/locations">Find Locations</RouterLink>
+            <RouterLink class="nav-link" to="/resources">Resources</RouterLink>
           </li>
+          <li class="nav-item"><RouterLink class="nav-link" to="/events">Events</RouterLink></li>
           <li class="nav-item"><RouterLink class="nav-link" to="/about">About</RouterLink></li>
         </ul>
       </div>
