@@ -1,0 +1,61 @@
+:root {
+  color: #243229;
+  background: #f7faf7;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #f7faf7;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.navbar-brand {
+  letter-spacing: -0.02em;
+}
+
+.navbar .router-link-exact-active:not(.navbar-brand) {
+  color: #fff;
+  font-weight: 600;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #eff8f0 0%, #f7faf7 70%);
+}
+
+.page-section {
+  padding-block: 3.5rem;
+}
+
+.placeholder-panel {
+  padding: 1.5rem;
+  border: 2px dashed #a9c6ae;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.recycling-card {
+  border-color: #d9e6dc;
+}
+
+.app-footer {
+  color: #dceadf;
+  background: #173c25;
+}
+
+@media (min-width: 1400px) {
+  .page-section {
+    padding-block: 5rem;
+  }
+}
