@@ -6,6 +6,11 @@ export const recyclingItems = [
     recyclable: false,
     disposal: 'Take household batteries to a designated battery recycling drop-off point. Never place them in household bins.',
     description: 'Common single-use and rechargeable household batteries contain recoverable materials but can cause fires in collection trucks.',
+    location: {
+      locationName: 'Clayton Community Recycling Centre',
+      suburb: 'Clayton',
+      distanceKm: 1.8,
+    },
   },
   {
     id: 2,
@@ -14,6 +19,11 @@ export const recyclingItems = [
     recyclable: true,
     disposal: 'Empty the bottle, remove its lid and place it loose in your council recycling bin. Check local rules for broken glass.',
     description: 'Empty glass bottles used for food and drinks can usually be recycled through household collections.',
+    location: {
+      locationName: 'Monash Recycling and Waste Centre',
+      suburb: 'Notting Hill',
+      distanceKm: 3.6,
+    },
   },
   {
     id: 3,
@@ -22,6 +32,11 @@ export const recyclingItems = [
     recyclable: true,
     disposal: 'Flatten clean, dry cardboard and place it loose in your council recycling bin.',
     description: 'Shipping boxes, cereal boxes and other clean cardboard packaging can be made into new paper products.',
+    location: {
+      locationName: 'Monash Recycling and Waste Centre',
+      suburb: 'Notting Hill',
+      distanceKm: 3.6,
+    },
   },
   {
     id: 4,
@@ -30,6 +45,11 @@ export const recyclingItems = [
     recyclable: true,
     disposal: 'Empty and rinse the bottle, then place it loose in your council recycling bin with the lid removed.',
     description: 'Rigid plastic drink, milk, shampoo and detergent bottles are commonly accepted for household recycling.',
+    location: {
+      locationName: 'Whitehorse Recycling and Waste Centre',
+      suburb: 'Vermont South',
+      distanceKm: 8.4,
+    },
   },
   {
     id: 5,
@@ -38,6 +58,11 @@ export const recyclingItems = [
     recyclable: true,
     disposal: 'Empty the can and place it loose in your council recycling bin. Do not put recyclables inside plastic bags.',
     description: 'Aluminium food and drink cans can be recycled repeatedly when they are correctly sorted.',
+    location: {
+      locationName: 'Port Phillip Resource Recovery Centre',
+      suburb: 'South Melbourne',
+      distanceKm: 12.2,
+    },
   },
   {
     id: 6,
@@ -46,6 +71,11 @@ export const recyclingItems = [
     recyclable: false,
     disposal: 'Remove personal data and take the phone to an approved e-waste or mobile-phone collection point.',
     description: 'Phones contain valuable metals and electronic components that require specialised recovery.',
+    location: {
+      locationName: 'Clayton E-Waste Collection Point',
+      suburb: 'Clayton',
+      distanceKm: 2.1,
+    },
   },
   {
     id: 7,
@@ -54,6 +84,11 @@ export const recyclingItems = [
     recyclable: false,
     disposal: 'Donate clean wearable clothing or use a reputable textile collection service. Do not place textiles in the household recycling bin.',
     description: 'Clothing in good condition can be reused, while damaged textiles may be accepted by specialist recyclers.',
+    location: {
+      locationName: 'Monash Community Textile Hub',
+      suburb: 'Oakleigh',
+      distanceKm: 5.1,
+    },
   },
   {
     id: 8,
@@ -62,5 +97,10 @@ export const recyclingItems = [
     recyclable: true,
     disposal: 'Use your council food and garden organics service where available, or compost suitable scraps at home.',
     description: 'Fruit and vegetable scraps, leftovers and other accepted food waste can be turned into compost.',
+    location: {
+      locationName: 'Monash Food Organics Hub',
+      suburb: 'Mulgrave',
+      distanceKm: 6.7,
+    },
   },
 ]

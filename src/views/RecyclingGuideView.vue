@@ -83,6 +83,7 @@ const filteredItems = computed(() => {
             :recyclable="item.recyclable"
             :disposal="item.disposal"
             :description="item.description"
+            :location="item.location"
           />
         </div>
       </div>

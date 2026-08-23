@@ -1,10 +1,13 @@
 <script setup>
+import { RouterLink } from 'vue-router'
+
 defineProps({
   name: { type: String, required: true },
   category: { type: String, required: true },
   recyclable: { type: Boolean, required: true },
   disposal: { type: String, required: true },
   description: { type: String, required: true },
+  location: { type: Object, default: null },
 })
 </script>
 
@@ -24,6 +27,22 @@ defineProps({
       <div class="mt-auto pt-2 border-top">
         <p class="fw-semibold mb-1">Disposal guidance</p>
         <p class="card-text mb-0">{{ disposal }}</p>
+      </div>
+
+      <div v-if="location" class="mt-3 pt-3 border-top">
+        <p class="small text-secondary fw-semibold text-uppercase mb-2">
+          Nearest Drop-off Location
+        </p>
+        <p class="fw-semibold mb-1">{{ location.locationName }}</p>
+        <p class="small text-secondary mb-3">
+          {{ location.suburb }} · Approx. {{ location.distanceKm }} km away
+        </p>
+        <RouterLink
+          class="btn btn-outline-success btn-sm"
+          :to="{ path: '/locations', query: { item: name } }"
+        >
+          View Location
+        </RouterLink>
       </div>
     </div>
   </article>
