@@ -1,5 +1,33 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import {
+  AUTH_CHANGED_EVENT,
+  getCurrentUser,
+  logoutUser,
+} from '../utils/auth'
+
+const router = useRouter()
+const currentUser = ref(getCurrentUser())
+
+function syncCurrentUser() {
+  currentUser.value = getCurrentUser()
+}
+
+async function handleLogout() {
+  logoutUser()
+  await router.push({ name: 'home' })
+}
+
+onMounted(() => {
+  window.addEventListener(AUTH_CHANGED_EVENT, syncCurrentUser)
+  window.addEventListener('storage', syncCurrentUser)
+})
+
+onUnmounted(() => {
+  window.removeEventListener(AUTH_CHANGED_EVENT, syncCurrentUser)
+  window.removeEventListener('storage', syncCurrentUser)
+})
 </script>
 
 <template>
@@ -30,6 +58,19 @@ import { RouterLink } from 'vue-router'
           </li>
           <li class="nav-item"><RouterLink class="nav-link" to="/events">Events</RouterLink></li>
           <li class="nav-item"><RouterLink class="nav-link" to="/about">About</RouterLink></li>
+          <li v-if="!currentUser" class="nav-item">
+            <RouterLink class="nav-link" to="/login">Login</RouterLink>
+          </li>
+          <template v-else>
+            <li class="nav-item">
+              <span class="nav-link text-white">{{ currentUser.username }}</span>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn btn-link" type="button" @click="handleLogout">
+                Logout
+              </button>
+            </li>
+          </template>
         </ul>
       </div>
     </div>

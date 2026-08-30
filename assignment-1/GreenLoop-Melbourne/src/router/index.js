@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AboutView from '../views/AboutView.vue'
 import HomeView from '../views/HomeView.vue'
 import LocationFinderView from '../views/LocationFinderView.vue'
+import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/RegisterView.vue'
 import EventsView from '../views/EventsView.vue'
 import RecyclingGuideView from '../views/RecyclingGuideView.vue'
 import ResourcesView from '../views/ResourcesView.vue'
@@ -19,6 +21,8 @@ const router = createRouter({
     { path: '/events', name: 'events', component: EventsView },
     { path: '/locations', name: 'locations', component: LocationFinderView },
     { path: '/about', name: 'about', component: AboutView },
+    { path: '/login', name: 'login', component: LoginView },
+    { path: '/register', name: 'register', component: RegisterView },
   ],
   scrollBehavior: () => ({ top: 0 }),
 })
