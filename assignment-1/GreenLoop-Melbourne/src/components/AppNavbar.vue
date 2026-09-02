@@ -1,33 +1,20 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import {
-  AUTH_CHANGED_EVENT,
-  getCurrentUser,
-  logoutUser,
-} from '../utils/auth'
+import { logoutUser, observeAuthState } from '../utils/auth'
 
 const router = useRouter()
-const currentUser = ref(getCurrentUser())
-
-function syncCurrentUser() {
-  currentUser.value = getCurrentUser()
-}
+const currentUser = ref(null)
+const stopObservingAuth = observeAuthState((user) => {
+  currentUser.value = user
+})
 
 async function handleLogout() {
-  logoutUser()
+  await logoutUser()
   await router.push({ name: 'home' })
 }
 
-onMounted(() => {
-  window.addEventListener(AUTH_CHANGED_EVENT, syncCurrentUser)
-  window.addEventListener('storage', syncCurrentUser)
-})
-
-onUnmounted(() => {
-  window.removeEventListener(AUTH_CHANGED_EVENT, syncCurrentUser)
-  window.removeEventListener('storage', syncCurrentUser)
-})
+onUnmounted(stopObservingAuth)
 </script>
 
 <template>

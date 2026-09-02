@@ -1,9 +1,10 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { loginUser } from '../utils/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authenticationError = ref('')
 
 const form = reactive({
@@ -58,13 +59,21 @@ async function handleSubmit() {
   const passwordIsValid = validateField('password')
   if (!emailIsValid || !passwordIsValid) return
 
-  const user = loginUser(form.email, form.password)
-  if (!user) {
-    authenticationError.value = 'The email or password is incorrect.'
-    return
-  }
+  try {
+    await loginUser(form.email, form.password)
+    await router.push({ name: 'home' })
+  } catch (error) {
+    const invalidCredentialCodes = [
+      'auth/invalid-credential',
+      'auth/invalid-login-credentials',
+      'auth/user-not-found',
+      'auth/wrong-password',
+    ]
 
-  await router.push({ name: 'home' })
+    authenticationError.value = invalidCredentialCodes.includes(error.code)
+      ? 'The email or password is incorrect.'
+      : 'Login could not be completed. Please try again.'
+  }
 }
 </script>
 
@@ -77,6 +86,10 @@ async function handleSubmit() {
             <div class="card-body p-4 p-md-5">
               <h1 class="h2">Welcome Back</h1>
               <p class="text-secondary mb-4">Log in to your GreenLoop Melbourne account.</p>
+
+              <div v-if="route.query.registered === 'true'" class="alert alert-success" role="status">
+                Your account was created successfully. You can now log in.
+              </div>
 
               <div v-if="authenticationError" class="alert alert-danger" role="alert">
                 {{ authenticationError }}

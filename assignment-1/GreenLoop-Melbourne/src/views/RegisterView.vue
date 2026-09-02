@@ -103,15 +103,28 @@ async function handleSubmit() {
   )
   if (!validationResults.every(Boolean)) return
 
-  const result = registerUser(form.username, form.email, form.password)
-  if (!result.success) {
-    errors.email = result.error
-    touched.email = true
-    registrationError.value = 'Registration could not be completed. Please review the form.'
-    return
-  }
+  try {
+    await registerUser(form.username, form.email, form.password)
+    await router.push({ name: 'login', query: { registered: 'true' } })
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      errors.email = 'An account with this email already exists.'
+      touched.email = true
+    } else if (error.code === 'auth/invalid-email') {
+      errors.email = 'Please enter a valid email address.'
+      touched.email = true
+    } else if (error.code === 'auth/weak-password') {
+      errors.password = 'Firebase rejected this password because it is too weak.'
+      touched.password = true
+    }
 
-  await router.push({ name: 'login' })
+    registrationError.value =
+      error.code === 'auth/email-already-in-use' ||
+      error.code === 'auth/invalid-email' ||
+      error.code === 'auth/weak-password'
+        ? 'Registration could not be completed. Please review the form.'
+        : 'Registration could not be completed. Please try again.'
+  }
 }
 </script>
 
