@@ -5,13 +5,15 @@ import { logoutUser, observeAuthState } from '../utils/auth'
 
 const router = useRouter()
 const currentUser = ref(null)
+const authIsReady = ref(false)
 const stopObservingAuth = observeAuthState((user) => {
   currentUser.value = user
+  authIsReady.value = true
 })
 
 async function handleLogout() {
   await logoutUser()
-  await router.push({ name: 'home' })
+  await router.push({ name: 'login' })
 }
 
 onUnmounted(stopObservingAuth)
@@ -45,12 +47,20 @@ onUnmounted(stopObservingAuth)
           </li>
           <li class="nav-item"><RouterLink class="nav-link" to="/events">Events</RouterLink></li>
           <li class="nav-item"><RouterLink class="nav-link" to="/about">About</RouterLink></li>
-          <li v-if="!currentUser" class="nav-item">
+          <li v-if="authIsReady && !currentUser" class="nav-item">
             <RouterLink class="nav-link" to="/login">Login</RouterLink>
           </li>
-          <template v-else>
+          <template v-else-if="currentUser">
+            <li v-if="currentUser.role === 'admin'" class="nav-item">
+              <RouterLink class="nav-link" to="/admin">Admin Dashboard</RouterLink>
+            </li>
             <li class="nav-item">
-              <span class="nav-link text-white">{{ currentUser.username }}</span>
+              <span class="nav-link text-white">
+                {{ currentUser.username }}
+                <span class="badge text-bg-light text-success ms-1">
+                  {{ currentUser.role === 'admin' ? 'Admin' : 'User' }}
+                </span>
+              </span>
             </li>
             <li class="nav-item">
               <button class="nav-link btn btn-link" type="button" @click="handleLogout">

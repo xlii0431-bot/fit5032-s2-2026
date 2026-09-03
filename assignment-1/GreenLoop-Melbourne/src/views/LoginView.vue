@@ -61,7 +61,24 @@ async function handleSubmit() {
 
   try {
     await loginUser(form.email, form.password)
-    await router.push({ name: 'home' })
+
+    const requestedRedirect = route.query.redirect
+    let destination = { name: 'home' }
+
+    if (
+      typeof requestedRedirect === 'string' &&
+      requestedRedirect.startsWith('/') &&
+      !requestedRedirect.startsWith('//')
+    ) {
+      const resolvedRoute = router.resolve(requestedRedirect)
+      const isProtectedRoute = resolvedRoute.matched.some(
+        (matchedRoute) => matchedRoute.meta.requiresAuth,
+      )
+
+      if (isProtectedRoute) destination = requestedRedirect
+    }
+
+    await router.push(destination)
   } catch (error) {
     const invalidCredentialCodes = [
       'auth/invalid-credential',

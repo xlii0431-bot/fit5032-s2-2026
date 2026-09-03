@@ -4,7 +4,9 @@ import { RouterLink, useRouter } from 'vue-router'
 import { registerUser } from '../utils/auth'
 
 const router = useRouter()
+const isDevelopment = import.meta.env.DEV
 const registrationError = ref('')
+const registrationErrorDetails = ref(null)
 
 const form = reactive({
   username: '',
@@ -84,6 +86,7 @@ function handleBlur(fieldName) {
 
 function handleInput(fieldName) {
   registrationError.value = ''
+  registrationErrorDetails.value = null
   if (touched[fieldName]) validateField(fieldName)
 
   if (fieldName === 'password' && touched.confirmPassword) {
@@ -93,6 +96,7 @@ function handleInput(fieldName) {
 
 async function handleSubmit() {
   registrationError.value = ''
+  registrationErrorDetails.value = null
 
   Object.keys(touched).forEach((fieldName) => {
     touched[fieldName] = true
@@ -107,6 +111,19 @@ async function handleSubmit() {
     await registerUser(form.username, form.email, form.password)
     await router.push({ name: 'login', query: { registered: 'true' } })
   } catch (error) {
+    registrationErrorDetails.value = {
+      stage: error.registrationStage || 'unknown',
+      code: error.code || 'unknown',
+    }
+
+    if (import.meta.env.DEV) {
+      console.error('Firebase registration failed', {
+        stage: registrationErrorDetails.value.stage,
+        code: registrationErrorDetails.value.code,
+        message: error.message,
+      })
+    }
+
     if (error.code === 'auth/email-already-in-use') {
       errors.email = 'An account with this email already exists.'
       touched.email = true
@@ -140,6 +157,10 @@ async function handleSubmit() {
 
               <div v-if="registrationError" class="alert alert-danger" role="alert">
                 {{ registrationError }}
+                <small v-if="isDevelopment && registrationErrorDetails" class="d-block mt-2">
+                  Development details: {{ registrationErrorDetails.stage }} —
+                  {{ registrationErrorDetails.code }}
+                </small>
               </div>
 
               <form novalidate @submit.prevent="handleSubmit">
