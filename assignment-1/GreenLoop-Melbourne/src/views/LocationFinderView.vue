@@ -1,10 +1,23 @@
+<script setup>
+import { onMounted, ref } from 'vue'
+import LocationRatingCard from '../components/LocationRatingCard.vue'
+import { recyclingLocations } from '../data/recyclingLocations'
+import { getCurrentUser } from '../utils/auth'
+
+const currentUser = ref(null)
+
+onMounted(async () => {
+  currentUser.value = await getCurrentUser()
+})
+</script>
+
 <template>
   <section class="page-section">
     <div class="container">
       <div class="row">
         <div class="col-12 col-lg-8 col-xl-7">
           <h1>Find a Recycling Location</h1>
-          <p class="lead">Enter your details to prepare a search for a suitable local facility.</p>
+          <p class="lead">Enter your details to prepare a future search for a suitable local facility.</p>
 
           <form class="card border-0 shadow-sm mt-4" @submit.prevent>
             <div class="card-body p-4">
@@ -32,9 +45,33 @@
                 />
               </div>
               <button class="btn btn-success" type="submit" disabled>Search coming soon</button>
-              <p class="form-text mb-0 mt-2">Validation and location results will be added later.</p>
+              <p class="form-text mb-0 mt-2">
+                Search functionality will be available in a later iteration.
+              </p>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div class="row mt-5">
+        <div class="col-12 col-lg-9">
+          <h2 class="h3">Featured Recycling Locations</h2>
+          <p class="text-secondary">
+            Browse sample recycling facilities, view community ratings and share your experience.
+          </p>
+        </div>
+      </div>
+
+      <div v-if="!currentUser" class="alert alert-light border" role="status">
+        Loading recycling locations...
+      </div>
+      <div v-else class="row g-4 mt-1">
+        <div
+          v-for="location in recyclingLocations"
+          :key="location.id"
+          class="col-12 col-md-6 col-xl-4"
+        >
+          <LocationRatingCard :location="location" :user-id="currentUser.uid" />
         </div>
       </div>
     </div>
