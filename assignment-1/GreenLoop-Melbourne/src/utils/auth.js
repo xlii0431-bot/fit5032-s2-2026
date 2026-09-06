@@ -16,9 +16,6 @@ import {
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 
-localStorage.removeItem('greenloop_users')
-localStorage.removeItem('greenloop_current_user')
-
 let authInitializationPromise
 
 function normaliseAuthUser(user) {
