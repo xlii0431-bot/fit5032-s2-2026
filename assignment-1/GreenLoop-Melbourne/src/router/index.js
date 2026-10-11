@@ -9,6 +9,7 @@ import RegisterView from '../views/RegisterView.vue'
 import EventsView from '../views/EventsView.vue'
 import RecyclingGuideView from '../views/RecyclingGuideView.vue'
 import ResourcesView from '../views/ResourcesView.vue'
+import ShareEmailView from '../views/ShareEmailView.vue'
 import { getCurrentUser, getCurrentUserProfile } from '../utils/auth'
 
 const router = createRouter({
@@ -49,6 +50,12 @@ const router = createRouter({
       path: '/interactive-data',
       name: 'interactive-data',
       component: InteractiveDataView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/share-email',
+      name: 'share-email',
+      component: ShareEmailView,
       meta: { requiresAuth: true },
     },
     { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true } },
