@@ -46,6 +46,9 @@ onUnmounted(stopObservingAuth)
             <RouterLink class="nav-link" to="/resources">Resources</RouterLink>
           </li>
           <li class="nav-item"><RouterLink class="nav-link" to="/events">Events</RouterLink></li>
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/interactive-data">Interactive Data</RouterLink>
+          </li>
           <li class="nav-item"><RouterLink class="nav-link" to="/about">About</RouterLink></li>
           <li v-if="authIsReady && !currentUser" class="nav-item">
             <RouterLink class="nav-link" to="/login">Login</RouterLink>

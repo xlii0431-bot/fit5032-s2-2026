@@ -63,4 +63,28 @@ export const resources = [
     description:
       'Pause before purchasing to consider need, durability, repairability, second-hand alternatives and end-of-life options.',
   },
+  {
+    id: 9,
+    title: 'Start Composting at Home',
+    category: 'Food Waste',
+    type: 'Guide',
+    description:
+      'Choose a suitable composting method, balance food scraps with dry materials and maintain a healthy household compost system.',
+  },
+  {
+    id: 10,
+    title: 'Repair Before You Replace',
+    category: 'Reuse',
+    type: 'Tips',
+    description:
+      'Assess common household faults, locate repair support and compare repair options before buying a replacement product.',
+  },
+  {
+    id: 11,
+    title: 'Prepare for Refill Shopping',
+    category: 'Sustainable Shopping',
+    type: 'Checklist',
+    description:
+      'Clean and label reusable containers, record their empty weights and prepare a list before visiting a refill retailer.',
+  },
 ]

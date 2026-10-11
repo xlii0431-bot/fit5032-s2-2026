@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AboutView from '../views/AboutView.vue'
 import AdminDashboardView from '../views/AdminDashboardView.vue'
 import HomeView from '../views/HomeView.vue'
+import InteractiveDataView from '../views/InteractiveDataView.vue'
 import LocationFinderView from '../views/LocationFinderView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
@@ -42,6 +43,12 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/interactive-data',
+      name: 'interactive-data',
+      component: InteractiveDataView,
       meta: { requiresAuth: true },
     },
     { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true } },
