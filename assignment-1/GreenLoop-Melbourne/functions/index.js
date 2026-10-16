@@ -6,6 +6,7 @@ const {defineSecret} = require("firebase-functions/params")
 const logger = require("firebase-functions/logger")
 const sendgrid = require("@sendgrid/mail")
 const {validateEmailRequest} = require("./emailHelpers")
+const {getSendGridDiagnostics} = require("./sendgridDiagnostics")
 
 initializeApp()
 setGlobalOptions({region: "australia-southeast1", maxInstances: 10})
@@ -94,15 +95,11 @@ exports.sendRecyclingEmail = onCall(
         ],
       })
     } catch (error) {
-      logger.error("SendGrid email request failed", {
-        uid: request.auth.uid,
-        providerStatus: error.code || error.response?.statusCode || "unknown",
-      })
+      logger.error("SendGrid email request failed", getSendGridDiagnostics(error))
       throw new HttpsError("internal", "The email could not be sent. Please try again later.")
     }
 
     logger.info("Recycling email sent", {
-      uid: request.auth.uid,
       selectedItemCount: selectedItems.length,
     })
     return {success: true, sharedItemCount: selectedItems.length}
