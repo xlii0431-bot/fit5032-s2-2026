@@ -1,5 +1,6 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { FileText } from '@lucide/vue'
 import { createCsvContent, downloadCsv } from '../utils/csv'
 
 const props = defineProps({
@@ -8,6 +9,10 @@ const props = defineProps({
   description: { type: String, required: true },
   rows: { type: Array, required: true },
   columns: { type: Array, required: true },
+  limitations: {
+    type: String,
+    default: 'This export contains GreenLoop educational application data and should not be treated as a complete or real-time representation of Melbourne services or outcomes.',
+  },
 })
 
 const rowsPerPage = 10
@@ -18,6 +23,9 @@ const columnSearches = reactive(
 const sortKey = ref('')
 const sortDirection = ref('ascending')
 const currentPage = ref(1)
+const sortAnnouncement = ref('No column sorting applied.')
+const isExportingPdf = ref(false)
+const pdfExportError = ref('')
 
 function displayValue(row, column) {
   const value = row[column.key]
@@ -73,6 +81,19 @@ const paginatedRows = computed(() => {
   const start = (currentPage.value - 1) * rowsPerPage
   return sortedRows.value.slice(start, start + rowsPerPage)
 })
+const activeConditions = computed(() => {
+  const conditions = []
+  if (globalSearch.value.trim()) conditions.push(`All columns contain “${globalSearch.value.trim()}”`)
+  props.columns
+    .filter((column) => column.searchable && columnSearches[column.key].trim())
+    .forEach((column) => conditions.push(`${column.label} contains “${columnSearches[column.key].trim()}”`))
+  return conditions
+})
+const sortDescription = computed(() => {
+  if (!sortKey.value) return 'Original dataset order'
+  const column = props.columns.find(({ key }) => key === sortKey.value)
+  return `${column?.label || sortKey.value}, ${sortDirection.value}`
+})
 
 watch(
   [globalSearch, () => props.columns.map((column) => columnSearches[column.key])],
@@ -92,6 +113,7 @@ function sortBy(column) {
   }
 
   currentPage.value = 1
+  sortAnnouncement.value = `${column.label} sorted ${sortDirection.value}.`
 }
 
 function ariaSort(column) {
@@ -108,6 +130,32 @@ function clearSearches() {
 function exportCsv() {
   const csvContent = createCsvContent(props.columns, sortedRows.value, displayValue)
   downloadCsv(`${props.tableId}.csv`, csvContent)
+}
+
+async function exportPdf() {
+  isExportingPdf.value = true
+  pdfExportError.value = ''
+  try {
+    const { downloadInteractiveDataPdf } = await import('../utils/interactiveDataPdf')
+    downloadInteractiveDataPdf(
+      {
+        title: `${props.title} — GreenLoop Melbourne`,
+        columns: props.columns,
+        rows: sortedRows.value,
+        getValue: displayValue,
+        activeConditions: activeConditions.value,
+        sortDescription: sortDescription.value,
+        totalAvailable: props.rows.length,
+        limitations: props.limitations,
+      },
+      `${props.tableId}.pdf`,
+    )
+  } catch (error) {
+    pdfExportError.value = 'The PDF could not be generated. Please try again or use the CSV export.'
+    if (import.meta.env.DEV) console.error(`${props.tableId} PDF export failed`, error)
+  } finally {
+    isExportingPdf.value = false
+  }
 }
 </script>
 
@@ -159,9 +207,10 @@ function exportCsv() {
       </fieldset>
 
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-        <p class="small text-secondary mb-0" aria-live="polite">
+        <p class="small text-secondary mb-0" role="status" aria-live="polite">
           {{ sortedRows.length }} {{ sortedRows.length === 1 ? 'record' : 'records' }} found
         </p>
+        <p class="visually-hidden" role="status" aria-live="polite">{{ sortAnnouncement }}</p>
         <div class="d-flex flex-wrap align-items-center gap-2">
           <p class="small text-secondary mb-0">Maximum 10 rows per page</p>
           <button
@@ -172,10 +221,29 @@ function exportCsv() {
           >
             Export CSV
           </button>
+          <button
+            class="btn btn-sm btn-outline-success pdf-export-button"
+            type="button"
+            :disabled="isExportingPdf"
+            :aria-busy="isExportingPdf"
+            @click="exportPdf"
+          >
+            <FileText :size="16" aria-hidden="true" />
+            {{ isExportingPdf ? 'Creating PDF…' : 'Export PDF' }}
+          </button>
         </div>
       </div>
 
-      <div class="table-responsive border rounded-3">
+      <p v-if="pdfExportError" class="alert alert-danger py-2" role="alert">
+        {{ pdfExportError }}
+      </p>
+
+      <div
+        class="table-responsive border rounded-3"
+        role="region"
+        tabindex="0"
+        :aria-label="`${title} table; scroll horizontally when needed`"
+      >
         <table class="table table-hover align-middle mb-0">
           <caption class="visually-hidden">{{ title }} with sortable and searchable columns</caption>
           <thead class="table-success">
@@ -190,14 +258,12 @@ function exportCsv() {
                   v-if="column.sortable"
                   class="sort-button"
                   type="button"
+                  :aria-label="`${column.label}: sort ${sortKey === column.key && sortDirection === 'ascending' ? 'descending' : 'ascending'}`"
                   @click="sortBy(column)"
                 >
                   {{ column.label }}
                   <span aria-hidden="true">
                     {{ sortKey === column.key ? (sortDirection === 'ascending' ? '▲' : '▼') : '↕' }}
-                  </span>
-                  <span class="visually-hidden">
-                    Sort {{ sortKey === column.key && sortDirection === 'ascending' ? 'descending' : 'ascending' }}
                   </span>
                 </button>
                 <span v-else>{{ column.label }}</span>
@@ -220,7 +286,9 @@ function exportCsv() {
       </div>
 
       <nav class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3" :aria-label="`${title} pagination`">
-        <span class="small text-secondary">Page {{ currentPage }} of {{ totalPages }}</span>
+        <span class="small text-secondary" role="status" aria-live="polite">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
         <div class="btn-group" role="group" aria-label="Pagination controls">
           <button
             class="btn btn-sm btn-outline-success"
@@ -270,5 +338,11 @@ function exportCsv() {
 th,
 td {
   min-width: 8rem;
+}
+
+.pdf-export-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 </style>

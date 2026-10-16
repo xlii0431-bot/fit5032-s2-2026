@@ -56,6 +56,7 @@ const resourceColumns = [
           description="Compare common items with their recycling category and nearest example drop-off location."
           :rows="recyclingRows"
           :columns="recyclingColumns"
+          limitations="This table contains GreenLoop educational guide entries and example location information. Approximate distances are demonstration values, not live user distances, and facility details should be verified before travel."
         />
 
         <InteractiveDataTable
@@ -64,6 +65,7 @@ const resourceColumns = [
           description="Browse the practical GreenLoop guides, tips and checklists already available in the application."
           :rows="resources"
           :columns="resourceColumns"
+          limitations="This table contains GreenLoop’s curated educational resources. It is not an exhaustive catalogue of Melbourne waste-reduction programs or official government guidance."
         />
       </div>
     </div>
