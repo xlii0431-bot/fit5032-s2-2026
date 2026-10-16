@@ -1,4 +1,18 @@
 :root {
+  --gl-green-900: #0b4f30;
+  --gl-green-700: #12653e;
+  --gl-green-600: #198754;
+  --gl-green-100: #e7f4eb;
+  --gl-surface: #ffffff;
+  --gl-surface-soft: #f4f8f5;
+  --gl-page-bg: #f7faf7;
+  --gl-border: #d9e6dc;
+  --gl-text: #243229;
+  --gl-text-muted: #607266;
+  --gl-amber-700: #806000;
+  --gl-amber-100: #fff8df;
+  --gl-card-radius: 0.85rem;
+  --gl-card-shadow: 0 0.4rem 1.5rem rgb(23 60 37 / 7%);
   color: #243229;
   background: #f7faf7;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -21,13 +35,266 @@ main {
   flex: 1;
 }
 
+main:focus {
+  outline: none;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2000;
+  padding: 0.75rem 1rem;
+  border-radius: 0.35rem;
+  color: #fff;
+  background: #0b4f30;
+  font-weight: 700;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  color: #fff;
+  transform: translateY(0);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #0b4f30;
+}
+
 .navbar-brand {
   letter-spacing: -0.02em;
 }
 
-.navbar .router-link-exact-active:not(.navbar-brand) {
+.greenloop-navbar {
+  position: relative;
+  padding-block: 0.65rem;
+  background: linear-gradient(110deg, #0b4f30, #198754);
+  box-shadow: 0 0.2rem 0.75rem rgb(11 79 48 / 18%);
+}
+
+.greenloop-navbar .container {
+  column-gap: 1rem;
+}
+
+.brand-mark {
+  display: inline-grid;
+  width: 1.85rem;
+  height: 1.85rem;
+  margin-right: 0.4rem;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 50%;
+  place-items: center;
+  background: rgb(255 255 255 / 12%);
+  font-size: 1rem;
+}
+
+.greenloop-navbar .nav-link.router-link-exact-active,
+.greenloop-navbar .nav-link.active {
   color: #fff;
   font-weight: 600;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff;
+}
+
+.greenloop-navbar .navbar-nav .nav-link {
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+}
+
+.greenloop-navbar .navbar-nav .nav-link:hover,
+.greenloop-navbar .navbar-nav .nav-link:focus-visible,
+.greenloop-navbar .navbar-nav .nav-link.active,
+.greenloop-navbar .navbar-nav .nav-link.router-link-exact-active {
+  color: #fff;
+  background: rgb(255 255 255 / 14%);
+  text-decoration: none;
+}
+
+.greenloop-navbar .dropdown-menu {
+  z-index: 1030;
+  width: max-content;
+  min-width: 12.5rem;
+  max-width: min(20rem, calc(100vw - 2rem));
+  height: auto;
+  padding: 0.25rem;
+  border: 1px solid #d9e6dc;
+  border-radius: 0.7rem;
+  box-shadow: 0 0.75rem 1.75rem rgb(23 60 37 / 18%);
+}
+
+@media (min-width: 1200px) {
+  .greenloop-navbar .dropdown-menu {
+    top: calc(100% + 0.35rem);
+    margin-top: 0;
+  }
+
+  .greenloop-navbar .account-navigation .dropdown {
+    position: static;
+  }
+
+  .greenloop-navbar #accountDropdown {
+    right: clamp(1rem, 1.25vw, 1.5rem);
+    left: auto;
+    width: 15.25rem;
+    min-width: 0;
+    max-width: calc(100vw - 2rem);
+    transform: none;
+  }
+}
+
+.greenloop-navbar .dropdown-item {
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.4rem;
+  color: #173c25;
+  white-space: normal;
+}
+
+.greenloop-navbar .dropdown-item:hover,
+.greenloop-navbar .dropdown-item:focus,
+.greenloop-navbar .dropdown-item.router-link-exact-active {
+  color: #0b4f30;
+  background: #e7f4eb;
+}
+
+.greenloop-navbar .dropdown-item.router-link-exact-active {
+  color: #0b4f30;
+  background: #e7f4eb;
+  font-weight: 700;
+}
+
+.greenloop-navbar .nav-panel {
+  width: 18.5rem;
+  padding: 0.4rem;
+}
+
+.greenloop-navbar .nav-panel-wide {
+  width: 19.5rem;
+}
+
+.greenloop-navbar .nav-panel-link {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  line-height: 1.2;
+}
+
+.greenloop-navbar .nav-panel-link > span:last-child {
+  min-width: 0;
+}
+
+.greenloop-navbar .nav-panel-link strong,
+.greenloop-navbar .nav-panel-link small {
+  display: block;
+}
+
+.greenloop-navbar .nav-panel-link strong {
+  color: inherit;
+  font-size: 0.92rem;
+}
+
+.greenloop-navbar .nav-panel-link small {
+  margin-top: 0.18rem;
+  color: #607266;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.greenloop-navbar .nav-panel-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.55rem;
+  color: #12653e;
+  background: #e7f4eb;
+  place-items: center;
+}
+
+.greenloop-navbar .nav-panel-link:hover small,
+.greenloop-navbar .nav-panel-link:focus small,
+.greenloop-navbar .nav-panel-link.router-link-exact-active small {
+  color: #365c44;
+}
+
+.account-menu-toggle {
+  display: flex;
+  max-width: 18rem;
+  align-items: center;
+}
+
+.account-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-role-badge {
+  color: #0b4f30;
+  background: #fff;
+}
+
+.account-summary {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.55rem 0.6rem 0.45rem;
+}
+
+.account-avatar {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: #12653e;
+  background: #e7f4eb;
+  place-items: center;
+}
+
+.account-identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.account-summary-role {
+  color: #0b4f30;
+  background: #dff3e6;
+  font-size: 0.68rem;
+}
+
+.greenloop-navbar .account-action {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.9rem;
+}
+
+.greenloop-navbar .account-action svg {
+  flex: 0 0 auto;
+}
+
+.greenloop-navbar #accountDropdown .dropdown-divider {
+  margin-block: 0.25rem;
+}
+
+.greenloop-navbar .account-logout {
+  color: #7b2530;
+}
+
+.greenloop-navbar .account-logout:hover,
+.greenloop-navbar .account-logout:focus {
+  color: #651e28;
+  background: #fbeaec;
 }
 
 .hero-section {
@@ -75,5 +342,50 @@ main {
 @media (min-width: 1400px) {
   .page-section {
     padding-block: 5rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-section {
+    padding-block: 2rem;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .greenloop-navbar .navbar-collapse {
+    padding-top: 0.75rem;
+  }
+
+  .greenloop-navbar .navbar-nav {
+    gap: 0.2rem;
+  }
+
+  .greenloop-navbar .dropdown-menu {
+    width: calc(100% - 0.5rem);
+    min-width: 0;
+    max-width: none;
+    margin: 0.15rem 0 0.3rem 0.5rem;
+    box-shadow: none;
+  }
+
+  .greenloop-navbar .nav-panel,
+  .greenloop-navbar .nav-panel-wide {
+    width: calc(100% - 0.5rem);
+  }
+
+  .greenloop-navbar .account-navigation {
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(255 255 255 / 25%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

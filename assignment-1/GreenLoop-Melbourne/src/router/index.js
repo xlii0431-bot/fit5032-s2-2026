@@ -10,6 +10,10 @@ import EventsView from '../views/EventsView.vue'
 import RecyclingGuideView from '../views/RecyclingGuideView.vue'
 import ResourcesView from '../views/ResourcesView.vue'
 import ShareEmailView from '../views/ShareEmailView.vue'
+import AnalyticsView from '../views/AnalyticsView.vue'
+import FavouritesView from '../views/FavouritesView.vue'
+import ImpactCalculatorView from '../views/ImpactCalculatorView.vue'
+import OfflineGuideView from '../views/OfflineGuideView.vue'
 import { getCurrentUser, getCurrentUserProfile } from '../utils/auth'
 
 const router = createRouter({
@@ -56,6 +60,30 @@ const router = createRouter({
       path: '/share-email',
       name: 'share-email',
       component: ShareEmailView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/analytics',
+      name: 'analytics',
+      component: AnalyticsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/favourites',
+      name: 'favourites',
+      component: FavouritesView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/impact-calculator',
+      name: 'impact-calculator',
+      component: ImpactCalculatorView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/offline-guide',
+      name: 'offline-guide',
+      component: OfflineGuideView,
       meta: { requiresAuth: true },
     },
     { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true } },
