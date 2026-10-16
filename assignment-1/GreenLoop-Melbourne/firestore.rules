@@ -1,0 +1,118 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function hasValidFavouriteFields() {
+      return request.resource.data.keys().hasOnly([
+          "itemId",
+          "createdAt"
+        ])
+        && request.resource.data.itemId is int
+        && request.resource.data.itemId > 0
+        && request.resource.data.createdAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasOnly([
+          "username",
+          "email",
+          "role",
+          "createdAt"
+        ])
+        && request.resource.data.username is string
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == "user"
+        && request.resource.data.createdAt is timestamp;
+
+      allow update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly([
+          "username",
+          "email",
+          "role",
+          "createdAt"
+        ])
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if false;
+    }
+
+    match /users/{userId}/favourites/{itemId} {
+      allow read: if isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && itemId.matches('^[0-9]+$')
+        && hasValidFavouriteFields()
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isOwner(userId)
+        && itemId.matches('^[0-9]+$')
+        && hasValidFavouriteFields()
+        && request.resource.data.itemId == resource.data.itemId
+        && request.resource.data.createdAt == request.time;
+
+      allow delete: if isOwner(userId);
+    }
+
+    match /locations/{locationId}/ratings/{ratingId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && ratingId == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          "rating",
+          "userId",
+          "createdAt",
+          "updatedAt"
+        ])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if signedIn()
+        && ratingId == request.auth.uid
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          "rating",
+          "userId",
+          "createdAt",
+          "updatedAt"
+        ])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+    }
+
+    match /books/{bookId} {
+      allow read, write: if true;
+    }
+  }
+}

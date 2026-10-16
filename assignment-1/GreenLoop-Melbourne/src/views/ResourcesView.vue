@@ -70,7 +70,7 @@ const filteredResources = computed(() => {
 
       <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
         <h2 class="h4 mb-0">Available resources</h2>
-        <span class="text-secondary text-nowrap">
+        <span class="text-secondary text-nowrap" role="status" aria-live="polite">
           {{ filteredResources.length }}
           {{ filteredResources.length === 1 ? 'resource' : 'resources' }}
         </span>

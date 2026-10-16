@@ -85,7 +85,7 @@ onUnmounted(() => {
 <template>
   <article class="card h-100 border-0 shadow-sm">
     <div class="card-body d-flex flex-column p-4">
-      <h2 class="h5">{{ location.name }}</h2>
+      <h3 class="h5">{{ location.name }}</h3>
       <p class="text-success fw-semibold mb-2">{{ location.suburb }}</p>
       <p class="text-secondary flex-grow-1">{{ location.description }}</p>
 
@@ -128,7 +128,7 @@ onUnmounted(() => {
 
 <style scoped>
 .star-button {
-  color: #d49b00;
+  color: #806000;
   font-size: 1.75rem;
   line-height: 1;
   text-decoration: none;
@@ -136,7 +136,7 @@ onUnmounted(() => {
 
 .star-button:hover,
 .star-button:focus-visible {
-  color: #a97800;
+  color: #664d03;
   transform: translateY(-1px);
 }
 

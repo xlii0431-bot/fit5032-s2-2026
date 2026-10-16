@@ -3,6 +3,7 @@ import { computed, nextTick, reactive, ref } from 'vue'
 import { events } from '../data/events'
 
 const registrationSection = ref(null)
+const registrationForm = ref(null)
 const isRegistrationVisible = ref(false)
 const successMessage = ref('')
 
@@ -101,7 +102,12 @@ async function selectEvent(eventId) {
   clearValidationState()
 
   await nextTick()
-  registrationSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  registrationSection.value?.scrollIntoView({
+    behavior: reduceMotion ? 'auto' : 'smooth',
+    block: 'start',
+  })
+  registrationSection.value?.focus({ preventScroll: true })
 }
 
 function cancelRegistration() {
@@ -110,7 +116,7 @@ function cancelRegistration() {
   clearValidationState()
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   successMessage.value = ''
 
   Object.keys(touched).forEach((fieldName) => {
@@ -119,7 +125,11 @@ function handleSubmit() {
 
   const validationResults = Object.keys(errors).map((fieldName) => validateField(fieldName))
   const isValid = validationResults.every(Boolean)
-  if (!isValid) return
+  if (!isValid) {
+    await nextTick()
+    registrationForm.value?.querySelector('[aria-invalid="true"]')?.focus()
+    return
+  }
 
   successMessage.value = `Registration successful! You are registered for ${selectedEvent.value.title}.`
   isRegistrationVisible.value = false
@@ -181,6 +191,7 @@ function handleSubmit() {
         ref="registrationSection"
         class="mt-5 scroll-margin-top"
         aria-labelledby="registration-heading"
+        tabindex="-1"
       >
         <div class="row justify-content-center">
           <div class="col-12 col-lg-9 col-xl-8">
@@ -189,7 +200,7 @@ function handleSubmit() {
                 <h2 id="registration-heading">Event Registration</h2>
                 <p class="text-secondary">Fields marked with <span aria-hidden="true">*</span> are required.</p>
 
-                <form novalidate @submit.prevent="handleSubmit">
+                <form ref="registrationForm" novalidate @submit.prevent="handleSubmit">
                   <div class="mb-3">
                     <label class="form-label" for="full-name">
                       Full Name <span class="text-danger" aria-hidden="true">*</span>
@@ -203,11 +214,16 @@ function handleSubmit() {
                       autocomplete="name"
                       required
                       :aria-invalid="Boolean(touched.fullName && errors.fullName)"
-                      aria-describedby="full-name-error"
+                      :aria-describedby="touched.fullName && errors.fullName ? 'full-name-error' : undefined"
                       @blur="handleBlur('fullName')"
                       @input="handleInput('fullName')"
                     />
-                    <div v-if="touched.fullName && errors.fullName" id="full-name-error" class="invalid-feedback">
+                    <div
+                      v-if="touched.fullName && errors.fullName"
+                      id="full-name-error"
+                      class="invalid-feedback"
+                      role="alert"
+                    >
                       {{ errors.fullName }}
                     </div>
                   </div>
@@ -225,11 +241,16 @@ function handleSubmit() {
                       autocomplete="email"
                       required
                       :aria-invalid="Boolean(touched.email && errors.email)"
-                      aria-describedby="email-error"
+                      :aria-describedby="touched.email && errors.email ? 'email-error' : undefined"
                       @blur="handleBlur('email')"
                       @input="handleInput('email')"
                     />
-                    <div v-if="touched.email && errors.email" id="email-error" class="invalid-feedback">
+                    <div
+                      v-if="touched.email && errors.email"
+                      id="email-error"
+                      class="invalid-feedback"
+                      role="alert"
+                    >
                       {{ errors.email }}
                     </div>
                   </div>
@@ -249,12 +270,19 @@ function handleSubmit() {
                       step="1"
                       required
                       :aria-invalid="Boolean(touched.attendees && errors.attendees)"
-                      aria-describedby="attendees-error attendees-help"
+                      :aria-describedby="touched.attendees && errors.attendees
+                        ? 'attendees-help attendees-error'
+                        : 'attendees-help'"
                       @blur="handleBlur('attendees')"
                       @input="handleInput('attendees')"
                     />
                     <div id="attendees-help" class="form-text">Enter a number from 1 to 5.</div>
-                    <div v-if="touched.attendees && errors.attendees" id="attendees-error" class="invalid-feedback">
+                    <div
+                      v-if="touched.attendees && errors.attendees"
+                      id="attendees-error"
+                      class="invalid-feedback d-block"
+                      role="alert"
+                    >
                       {{ errors.attendees }}
                     </div>
                   </div>
@@ -270,7 +298,7 @@ function handleSubmit() {
                       :class="{ 'is-invalid': touched.eventId && errors.eventId }"
                       required
                       :aria-invalid="Boolean(touched.eventId && errors.eventId)"
-                      aria-describedby="event-error"
+                      :aria-describedby="touched.eventId && errors.eventId ? 'event-error' : undefined"
                       @blur="handleBlur('eventId')"
                       @change="handleInput('eventId')"
                     >
@@ -279,7 +307,12 @@ function handleSubmit() {
                         {{ event.title }}
                       </option>
                     </select>
-                    <div v-if="touched.eventId && errors.eventId" id="event-error" class="invalid-feedback">
+                    <div
+                      v-if="touched.eventId && errors.eventId"
+                      id="event-error"
+                      class="invalid-feedback"
+                      role="alert"
+                    >
                       {{ errors.eventId }}
                     </div>
                   </div>

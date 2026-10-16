@@ -1,7 +1,9 @@
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from 'firebase/auth'
@@ -17,6 +19,8 @@ import {
 import { auth, db } from '../firebase'
 
 let authInitializationPromise
+const googleProvider = new GoogleAuthProvider()
+googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 function normaliseAuthUser(user) {
   if (!user) return null
@@ -85,6 +89,12 @@ async function ensureUserProfile(user, username = '') {
 
 export async function loginUser(email, password) {
   const credential = await signInWithEmailAndPassword(auth, email.trim(), password)
+  const profile = await ensureUserProfile(credential.user)
+  return { ...normaliseAuthUser(credential.user), ...profile, role: normaliseRole(profile.role) }
+}
+
+export async function loginWithGoogle() {
+  const credential = await signInWithPopup(auth, googleProvider)
   const profile = await ensureUserProfile(credential.user)
   return { ...normaliseAuthUser(credential.user), ...profile, role: normaliseRole(profile.role) }
 }

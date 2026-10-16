@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import { recyclingItems } from '../data/recyclingItems'
 import { createCsvContent } from '../utils/csv'
 import { sendRecyclingEmail } from '../utils/email'
@@ -14,6 +14,7 @@ const errors = reactive({recipient: '', message: '', selection: ''})
 const isSending = ref(false)
 const successMessage = ref('')
 const sendError = ref('')
+const shareForm = ref(null)
 
 const emailColumns = [
   {key: 'name', label: 'Item'},
@@ -70,7 +71,14 @@ function toggleAllItems() {
 async function handleSubmit() {
   successMessage.value = ''
   sendError.value = ''
-  if (!validateForm()) return
+  if (!validateForm()) {
+    await nextTick()
+    const firstInvalidControl = shareForm.value?.querySelector(
+      'input[aria-invalid="true"], textarea[aria-invalid="true"], fieldset[aria-invalid="true"] input',
+    )
+    firstInvalidControl?.focus()
+    return
+  }
 
   const csvContent = createCsvContent(emailColumns, selectedItems.value, (row, column) => row[column.key])
   isSending.value = true
@@ -116,7 +124,13 @@ async function handleSubmit() {
             {{ sendError }}
           </div>
 
-          <form class="card border-0 shadow-sm mt-4" novalidate @submit.prevent="handleSubmit">
+          <form
+            ref="shareForm"
+            class="card border-0 shadow-sm mt-4"
+            novalidate
+            :aria-busy="isSending"
+            @submit.prevent="handleSubmit"
+          >
             <div class="card-body p-4 p-md-5">
               <div class="row g-4">
                 <div class="col-12 col-lg-5">
@@ -132,10 +146,15 @@ async function handleSubmit() {
                       maxlength="254"
                       required
                       :aria-invalid="Boolean(errors.recipient)"
-                      aria-describedby="share-recipient-error"
+                      :aria-describedby="errors.recipient ? 'share-recipient-error' : undefined"
                       @input="errors.recipient = ''; successMessage = ''; sendError = ''"
                     />
-                    <div v-if="errors.recipient" id="share-recipient-error" class="invalid-feedback">
+                    <div
+                      v-if="errors.recipient"
+                      id="share-recipient-error"
+                      class="invalid-feedback"
+                      role="alert"
+                    >
                       {{ errors.recipient }}
                     </div>
                   </div>
@@ -152,19 +171,30 @@ async function handleSubmit() {
                       rows="7"
                       :maxlength="MAX_MESSAGE_LENGTH"
                       :aria-invalid="Boolean(errors.message)"
-                      aria-describedby="share-message-help share-message-error"
+                      :aria-describedby="errors.message
+                        ? 'share-message-help share-message-error'
+                        : 'share-message-help'"
                       @input="errors.message = ''; successMessage = ''; sendError = ''"
                     ></textarea>
                     <div id="share-message-help" class="form-text">
                       {{ form.message.length }} / {{ MAX_MESSAGE_LENGTH }} characters
                     </div>
-                    <div v-if="errors.message" id="share-message-error" class="invalid-feedback">
+                    <div
+                      v-if="errors.message"
+                      id="share-message-error"
+                      class="invalid-feedback d-block"
+                      role="alert"
+                    >
                       {{ errors.message }}
                     </div>
                   </div>
                 </div>
 
-                <fieldset class="col-12 col-lg-7">
+                <fieldset
+                  class="col-12 col-lg-7"
+                  :aria-invalid="Boolean(errors.selection)"
+                  :aria-describedby="errors.selection ? 'share-selection-error' : undefined"
+                >
                   <legend class="h5">Select recycling information</legend>
                   <button class="btn btn-sm btn-outline-success mb-3" type="button" @click="toggleAllItems">
                     {{ allItemsSelected ? 'Clear all' : 'Select all' }}
@@ -187,7 +217,12 @@ async function handleSubmit() {
                       </div>
                     </div>
                   </div>
-                  <p v-if="errors.selection" class="text-danger small mt-2 mb-0" role="alert">
+                  <p
+                    v-if="errors.selection"
+                    id="share-selection-error"
+                    class="text-danger small mt-2 mb-0"
+                    role="alert"
+                  >
                     {{ errors.selection }}
                   </p>
                 </fieldset>
@@ -202,7 +237,7 @@ async function handleSubmit() {
                   ></span>
                   {{ isSending ? 'Sending...' : 'Send Email' }}
                 </button>
-                <span class="text-secondary small">
+                <span class="text-secondary small" role="status" aria-live="polite">
                   {{ selectedItems.length }} {{ selectedItems.length === 1 ? 'item' : 'items' }} selected
                 </span>
               </div>

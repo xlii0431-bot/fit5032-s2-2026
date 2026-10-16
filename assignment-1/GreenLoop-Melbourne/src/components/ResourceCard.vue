@@ -14,7 +14,7 @@ defineProps({
         <span class="badge text-bg-success">{{ category }}</span>
         <span class="badge text-bg-light border text-secondary">{{ type }}</span>
       </div>
-      <h2 class="h5 card-title">{{ title }}</h2>
+      <h3 class="h5 card-title">{{ title }}</h3>
       <p class="card-text mb-0">{{ description }}</p>
     </div>
   </article>
