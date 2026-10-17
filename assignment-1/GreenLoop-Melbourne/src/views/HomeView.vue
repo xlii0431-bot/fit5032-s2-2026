@@ -1,6 +1,7 @@
 <script setup>
 import { BarChart3, BookOpen, Calculator, CalendarDays, ChevronRight, Database, Heart, MapPinned, Recycle, Share2, WifiOff } from '@lucide/vue'
 import { RouterLink } from 'vue-router'
+import RecyclingOrbitIllustration from '../components/illustrations/RecyclingOrbitIllustration.vue'
 
 const workflowSteps = [
   { number: '01', title: 'Learn', feature: 'Recycling Guide', description: 'Look up common household items and understand the appropriate recycling or disposal pathway.', cta: 'Learn how to recycle', to: '/recycling-guide', icon: Recycle },
@@ -35,14 +36,8 @@ const personalFeatures = [
               Start Recycling <ChevronRight :size="20" aria-hidden="true" />
             </RouterLink>
           </div>
-          <div class="col-12 col-lg-5" aria-hidden="true">
-            <div class="hero-visual">
-              <div class="hero-orbit hero-orbit-large"></div>
-              <div class="hero-orbit hero-orbit-small"></div>
-              <div class="hero-icon hero-icon-main"><Recycle :size="58" :stroke-width="1.7" /></div>
-              <div class="hero-icon hero-icon-map"><MapPinned :size="27" /></div>
-              <div class="hero-icon hero-icon-chart"><BarChart3 :size="27" /></div>
-            </div>
+          <div class="hero-visual-column col-12 col-lg-5" aria-hidden="true">
+            <RecyclingOrbitIllustration class="hero-visual" />
           </div>
         </div>
       </div>
@@ -132,14 +127,6 @@ const personalFeatures = [
 .hero-copy { max-width: 42rem; color: #375d47; font-size: clamp(1.08rem, 2vw, 1.3rem); line-height: 1.65; }
 .hero-primary, .feature-link { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 700; }
 .hero-visual { position: relative; width: min(100%, 24rem); aspect-ratio: 1; margin-inline: auto; }
-.hero-orbit, .hero-icon { position: absolute; border-radius: 50%; }
-.hero-orbit { inset: 8%; border: 1px solid rgb(18 101 62 / 28%); }
-.hero-orbit-small { inset: 24%; border-style: dashed; }
-.hero-icon { display: grid; color: #fff; background: var(--gl-green-600); box-shadow: 0 1rem 2.5rem rgb(11 79 48 / 24%); place-items: center; }
-.hero-icon-main { inset: 31%; }
-.hero-icon-map, .hero-icon-chart { width: 4.2rem; height: 4.2rem; color: var(--gl-green-700); background: var(--gl-surface); }
-.hero-icon-map { top: 3%; right: 13%; }
-.hero-icon-chart { bottom: 7%; left: 8%; }
 .workflow-section, .discover-section, .personal-section { padding-block: clamp(3.5rem, 6vw, 5.5rem); }
 .section-intro { max-width: 50rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
 .workflow-list { position: relative; }

@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
+import RecyclingOrbitIllustration from './illustrations/RecyclingOrbitIllustration.vue'
 
 defineProps({
   title: { type: String, required: true },
@@ -14,6 +15,7 @@ defineProps({
         <div class="row g-0">
           <aside class="auth-brand-panel col-12 col-lg-5 p-4 p-md-5 text-white">
             <RouterLink class="auth-brand-link" to="/">GreenLoop Melbourne</RouterLink>
+            <RecyclingOrbitIllustration class="auth-brand-illustration" />
             <div class="auth-brand-content">
               <p class="text-uppercase small fw-semibold mb-2">A greener Melbourne starts here</p>
               <p class="display-6 fw-semibold mb-3">Recycle smarter. Waste less.</p>
@@ -71,6 +73,11 @@ defineProps({
   max-width: 24rem;
 }
 
+.auth-brand-illustration {
+  width: min(100%, 19rem);
+  margin: 1rem auto;
+}
+
 .auth-form {
   max-width: 28rem;
 }
@@ -78,6 +85,12 @@ defineProps({
 @media (min-width: 992px) {
   .auth-brand-panel {
     min-height: 42rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .auth-brand-illustration {
+    display: none;
   }
 }
 </style>

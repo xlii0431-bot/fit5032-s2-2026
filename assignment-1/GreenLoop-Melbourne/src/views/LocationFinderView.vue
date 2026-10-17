@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import LocationMap from '../components/LocationMap.vue'
 import LocationRatingCard from '../components/LocationRatingCard.vue'
+import LocationRouteIllustration from '../components/illustrations/LocationRouteIllustration.vue'
 import { recyclingLocations } from '../data/recyclingLocations'
 import { getCurrentUser } from '../utils/auth'
 import {
@@ -178,7 +179,7 @@ onUnmounted(() => {
 <template>
   <section class="page-section">
     <div class="container">
-      <div class="row">
+      <div class="row align-items-center g-3">
         <div class="col-12 col-xl-9">
           <h1>Recycling Location Finder</h1>
           <p class="lead mb-2">
@@ -189,6 +190,9 @@ onUnmounted(() => {
             Always confirm accepted items, fees and access requirements with the facility before
             travelling.
           </p>
+        </div>
+        <div class="col-12 col-xl-3 d-flex justify-content-xl-end">
+          <LocationRouteIllustration class="page-intro-illustration location-intro-illustration" />
         </div>
       </div>
 

@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RecyclingCard from '../components/RecyclingCard.vue'
+import WasteSortingIllustration from '../components/illustrations/WasteSortingIllustration.vue'
 import { recyclingItems } from '../data/recyclingItems'
 import { getCurrentUser } from '../utils/auth'
 import { observeFavourites, removeFavourite, saveFavourite } from '../utils/favourites'
@@ -110,7 +111,8 @@ onUnmounted(() => stopObservingFavourites?.())
             responsibly.
           </p>
         </div>
-        <div class="col-12 col-lg-4 d-lg-flex justify-content-lg-end">
+        <div class="col-12 col-lg-4 d-flex flex-column align-items-lg-end gap-2">
+          <WasteSortingIllustration class="page-intro-illustration recycling-intro-illustration" />
           <RouterLink class="btn btn-outline-success" to="/locations">
             Find Nearby Recycling Centres
           </RouterLink>

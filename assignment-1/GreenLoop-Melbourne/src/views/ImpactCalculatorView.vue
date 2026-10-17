@@ -4,12 +4,21 @@ import { Bar } from 'vue-chartjs'
 import { computed, ref } from 'vue'
 import { impactMaterials, impactSources } from '../data/impactFactors'
 import { calculateAvoidedEmissions } from '../utils/impact'
+import { useAccessibilityPreferences } from '../utils/accessibilityPreferences'
+import { chartSurfacePlugin, getChartFontSize } from '../utils/chartPreferences'
+import EarthLeavesIllustration from '../components/illustrations/EarthLeavesIllustration.vue'
 
-ChartJS.register(BarElement, CategoryScale, Legend, LinearScale, Tooltip)
+ChartJS.register(BarElement, CategoryScale, Legend, LinearScale, Tooltip, chartSurfacePlugin)
 
 const materialId = ref('mixed-recyclables')
 const weightKg = ref('10')
 const touched = ref(false)
+const { preferences, effectiveReduceMotion, effectiveColorScheme } = useAccessibilityPreferences()
+const chartFontSize = computed(() => getChartFontSize(preferences.textSize))
+const chartTextColor = computed(() => preferences.highContrast
+  ? effectiveColorScheme.value === 'dark' ? '#ffffff' : '#000000'
+  : effectiveColorScheme.value === 'dark' ? '#edf5ef' : '#243229')
+const chartGridColor = computed(() => effectiveColorScheme.value === 'dark' ? '#53675a' : '#d8e3dc')
 const supportedMaterials = impactMaterials.filter(({ supported }) => supported)
 const unsupportedMaterials = impactMaterials.filter(({ supported }) => !supported)
 const material = computed(() => impactMaterials.find(({ id }) => id === materialId.value))
@@ -33,19 +42,24 @@ const comparisonChartData = computed(() => ({
     borderWidth: 1,
   }],
 }))
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
+  animation: effectiveReduceMotion.value ? false : undefined,
+  plugins: {
+    greenloopSurface: { color: effectiveColorScheme.value === 'dark' ? '#19231d' : '#ffffff' },
+    legend: { display: false },
+    tooltip: { titleFont: { size: chartFontSize.value }, bodyFont: { size: chartFontSize.value } },
+  },
   scales: {
     y: {
-      title: { display: true, text: 'Net kg CO₂e' },
-      ticks: { color: '#243229' },
-      grid: { color: '#d8e3dc' },
+      title: { display: true, text: 'Net kg CO₂e', color: chartTextColor.value, font: { size: chartFontSize.value } },
+      ticks: { color: chartTextColor.value, font: { size: chartFontSize.value } },
+      grid: { color: chartGridColor.value },
     },
-    x: { ticks: { color: '#243229' } },
+    x: { ticks: { color: chartTextColor.value, font: { size: chartFontSize.value } }, grid: { color: chartGridColor.value } },
   },
-}
+}))
 </script>
 
 <template>
@@ -53,8 +67,15 @@ const chartOptions = {
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
-          <h1>Environmental Impact Calculator</h1>
-          <p class="lead">Compare documented recycling and landfill scenarios for a selected material.</p>
+          <div class="row align-items-center g-3">
+            <div class="col-12 col-md-8">
+              <h1>Environmental Impact Calculator</h1>
+              <p class="lead">Compare documented recycling and landfill scenarios for a selected material.</p>
+            </div>
+            <div class="col-12 col-md-4 d-flex justify-content-md-end">
+              <EarthLeavesIllustration class="page-intro-illustration impact-intro-illustration" />
+            </div>
+          </div>
 
           <div class="alert alert-warning">
             This educational calculator uses US EPA WARM Version 16 national-average life-cycle factors,
