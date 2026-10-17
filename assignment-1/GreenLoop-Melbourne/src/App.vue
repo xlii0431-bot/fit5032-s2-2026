@@ -3,6 +3,7 @@ import { nextTick, ref, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import AppFooter from './components/AppFooter.vue'
 import AppNavbar from './components/AppNavbar.vue'
+import GreenLoopGuide from './components/GreenLoopGuide.vue'
 import NetworkStatus from './components/NetworkStatus.vue'
 
 const route = useRoute()
@@ -30,6 +31,7 @@ watch(
     <main id="main-content" ref="mainContent" tabindex="-1">
       <RouterView />
     </main>
+    <GreenLoopGuide />
     <AppFooter />
   </div>
 </template>
