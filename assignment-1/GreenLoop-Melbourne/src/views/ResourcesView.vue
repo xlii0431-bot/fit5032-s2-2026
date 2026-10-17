@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import ResourceCard from '../components/ResourceCard.vue'
 import { resources } from '../data/resources'
+import EducationResourcesIllustration from '../components/illustrations/EducationResourcesIllustration.vue'
 
 const selectedCategory = ref('')
 const selectedType = ref('')
@@ -28,14 +29,15 @@ const filteredResources = computed(() => {
 <template>
   <section class="page-section">
     <div class="container">
-      <div class="row">
-        <div class="col-12 col-lg-9 col-xl-8">
+      <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="flex-grow-1">
           <h1>Waste Reduction Resources</h1>
-          <p class="lead">
+          <p class="lead mb-0">
             Explore practical guides, tips and checklists to help Melbourne households reduce waste
             and make more sustainable everyday choices.
           </p>
         </div>
+        <EducationResourcesIllustration class="page-intro-illustration resources-intro-illustration" />
       </div>
 
       <div class="card border-0 shadow-sm mt-4 mb-4">

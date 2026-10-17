@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, reactive, ref } from 'vue'
 import { events } from '../data/events'
+import CommunityGardenIllustration from '../components/illustrations/CommunityGardenIllustration.vue'
 
 const registrationSection = ref(null)
 const registrationForm = ref(null)
@@ -139,13 +140,14 @@ async function handleSubmit() {
 <template>
   <section class="page-section">
     <div class="container">
-      <div class="row">
-        <div class="col-12 col-lg-9 col-xl-8">
+      <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="flex-grow-1">
           <h1>Community Events</h1>
-          <p class="lead">
+          <p class="lead mb-0">
             Discover local sustainability, recycling and waste-reduction events across Melbourne.
           </p>
         </div>
+        <CommunityGardenIllustration class="page-intro-illustration events-intro-illustration" />
       </div>
 
       <div class="row g-4 mt-1">
