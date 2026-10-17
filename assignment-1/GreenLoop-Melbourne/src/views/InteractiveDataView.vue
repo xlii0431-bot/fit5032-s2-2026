@@ -2,6 +2,7 @@
 import InteractiveDataTable from '../components/InteractiveDataTable.vue'
 import { recyclingItems } from '../data/recyclingItems'
 import { resources } from '../data/resources'
+import DataFlowIllustration from '../components/illustrations/DataFlowIllustration.vue'
 
 const recyclingRows = recyclingItems.map((item) => ({
   id: item.id,
@@ -39,14 +40,15 @@ const resourceColumns = [
 <template>
   <section class="page-section">
     <div class="container">
-      <div class="row">
-        <div class="col-12 col-lg-9 col-xl-8">
+      <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="flex-grow-1">
           <h1>Interactive Data</h1>
           <p class="lead">
             Explore GreenLoop recycling and waste-reduction information using searchable,
             sortable tables.
           </p>
         </div>
+        <DataFlowIllustration class="page-intro-illustration data-intro-illustration" />
       </div>
 
       <div class="d-grid gap-5 mt-4">

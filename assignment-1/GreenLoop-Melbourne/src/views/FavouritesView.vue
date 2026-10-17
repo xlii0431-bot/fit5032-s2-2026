@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { recyclingItems } from '../data/recyclingItems'
 import { getCurrentUser } from '../utils/auth'
 import { observeFavourites, removeFavourite } from '../utils/favourites'
+import FavouriteLeafIllustration from '../components/illustrations/FavouriteLeafIllustration.vue'
 
 const currentUser = ref(null)
 const favouriteIds = ref([])
@@ -67,8 +68,13 @@ onUnmounted(() => stopObserving?.())
 <template>
   <section class="page-section">
     <div class="container">
-      <h1>My Recycling Favourites</h1>
-      <p class="lead">Your saved recycling guidance in one convenient place.</p>
+      <div class="d-flex flex-column flex-md-row align-items-md-center gap-3 mb-2">
+        <div class="flex-grow-1">
+          <h1>My Recycling Favourites</h1>
+          <p class="lead mb-0">Your saved recycling guidance in one convenient place.</p>
+        </div>
+        <FavouriteLeafIllustration class="page-intro-illustration favourites-intro-illustration" />
+      </div>
       <p v-if="feedback" class="alert alert-success" role="status" aria-live="polite">{{ feedback }}</p>
       <p v-if="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</p>
       <div v-if="isLoading" class="alert alert-light border" role="status">Loading favourites...</div>

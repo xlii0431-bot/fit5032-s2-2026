@@ -3,6 +3,7 @@ import { computed, nextTick, reactive, ref } from 'vue'
 import { recyclingItems } from '../data/recyclingItems'
 import { createCsvContent } from '../utils/csv'
 import { sendRecyclingEmail } from '../utils/email'
+import EcoMailIllustration from '../components/illustrations/EcoMailIllustration.vue'
 
 const MAX_MESSAGE_LENGTH = 1000
 const form = reactive({
@@ -112,10 +113,13 @@ async function handleSubmit() {
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
-          <h1>Share Recycling Information</h1>
-          <p class="lead">
-            Email selected GreenLoop recycling guidance as a CSV attachment.
-          </p>
+          <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+            <div class="flex-grow-1">
+              <h1>Share Recycling Information</h1>
+              <p class="lead mb-0">Email selected GreenLoop recycling guidance as a CSV attachment.</p>
+            </div>
+            <EcoMailIllustration class="page-intro-illustration share-intro-illustration" />
+          </div>
 
           <div v-if="successMessage" class="alert alert-success" role="status">
             {{ successMessage }}

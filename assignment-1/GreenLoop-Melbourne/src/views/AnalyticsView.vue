@@ -14,14 +14,23 @@ import { computed, ref } from 'vue'
 import { recyclingItems } from '../data/recyclingItems'
 import { summarizeRecyclingItems } from '../utils/analytics'
 import { createCsvContent, downloadCsv } from '../utils/csv'
+import { useAccessibilityPreferences } from '../utils/accessibilityPreferences'
+import { chartSurfacePlugin, getChartFontSize } from '../utils/chartPreferences'
+import AnalyticsGrowthIllustration from '../components/illustrations/AnalyticsGrowthIllustration.vue'
 
-ChartJS.register(ArcElement, BarElement, CategoryScale, Legend, LinearScale, Tooltip)
+ChartJS.register(ArcElement, BarElement, CategoryScale, Legend, LinearScale, Tooltip, chartSurfacePlugin)
 
 const selectedCategories = ref([])
 const categoryChart = ref(null)
 const pathwayChart = ref(null)
 const isExportingPdf = ref(false)
 const exportError = ref('')
+const { preferences, effectiveReduceMotion, effectiveColorScheme } = useAccessibilityPreferences()
+const chartFontSize = computed(() => getChartFontSize(preferences.textSize))
+const chartTextColor = computed(() => preferences.highContrast
+  ? effectiveColorScheme.value === 'dark' ? '#ffffff' : '#000000'
+  : effectiveColorScheme.value === 'dark' ? '#edf5ef' : '#243229')
+const chartGridColor = computed(() => effectiveColorScheme.value === 'dark' ? '#53675a' : '#d8e3dc')
 const categories = [...new Set(recyclingItems.map((item) => item.category))].sort()
 const summary = computed(() => summarizeRecyclingItems(recyclingItems, selectedCategories.value))
 const categoryChartData = computed(() => ({
@@ -54,12 +63,16 @@ const pathwayChartData = computed(() => ({
     },
   ],
 }))
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  animation: effectiveReduceMotion.value ? false : undefined,
   plugins: {
-    legend: { labels: { color: '#243229' } },
+    greenloopSurface: { color: effectiveColorScheme.value === 'dark' ? '#19231d' : '#ffffff' },
+    legend: { labels: { color: chartTextColor.value, font: { size: chartFontSize.value } } },
     tooltip: {
+      titleFont: { size: chartFontSize.value },
+      bodyFont: { size: chartFontSize.value },
       callbacks: {
         title: (items) => items[0]?.label || '',
         label: (context) => {
@@ -70,15 +83,20 @@ const chartOptions = {
     },
   },
   scales: {
-    x: { stacked: true },
-    y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
+    x: { stacked: true, ticks: { color: chartTextColor.value, font: { size: chartFontSize.value } }, grid: { color: chartGridColor.value } },
+    y: { stacked: true, beginAtZero: true, ticks: { precision: 0, color: chartTextColor.value, font: { size: chartFontSize.value } }, grid: { color: chartGridColor.value } },
   },
-}
-const doughnutOptions = {
+}))
+const doughnutOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { position: 'bottom', labels: { color: '#243229' } } },
-}
+  animation: effectiveReduceMotion.value ? false : undefined,
+  plugins: {
+    greenloopSurface: { color: effectiveColorScheme.value === 'dark' ? '#19231d' : '#ffffff' },
+    legend: { position: 'bottom', labels: { color: chartTextColor.value, font: { size: chartFontSize.value } } },
+    tooltip: { titleFont: { size: chartFontSize.value }, bodyFont: { size: chartFontSize.value } },
+  },
+}))
 
 function exportCsv() {
   const columns = [
@@ -129,9 +147,12 @@ async function exportPdf() {
   <section class="page-section">
     <div class="container">
       <div class="d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-3 mb-3">
-        <div>
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3 flex-grow-1">
+          <div>
           <h1>Recycling Analytics Dashboard</h1>
           <p class="lead mb-0">Explore the composition of GreenLoop's demonstration recycling guide.</p>
+          </div>
+          <AnalyticsGrowthIllustration class="page-intro-illustration analytics-intro-illustration ms-md-auto" />
         </div>
         <div class="d-flex flex-wrap gap-2 export-actions" aria-label="Analytics exports">
           <button class="btn btn-outline-success" type="button" @click="exportCsv">

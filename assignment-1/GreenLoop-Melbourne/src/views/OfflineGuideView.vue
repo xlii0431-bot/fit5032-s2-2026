@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { CheckCircle2, CloudOff, Download, RefreshCw, Wifi, WifiOff } from '@lucide/vue'
 import { RouterLink } from 'vue-router'
+import OfflinePhoneIllustration from '../components/illustrations/OfflinePhoneIllustration.vue'
 import {
   appIsInstalled,
   checkOfflineAvailability,
@@ -76,7 +77,7 @@ onUnmounted(() => {
   <section class="page-section offline-guide-page">
     <div class="container">
       <div class="row align-items-center g-4">
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-7">
           <p class="text-success fw-semibold text-uppercase mb-2">Guidance when you need it</p>
           <h1>Offline Recycling Guide</h1>
           <p class="lead mb-0">
@@ -84,10 +85,9 @@ onUnmounted(() => {
             offline use.
           </p>
         </div>
-        <div class="col-12 col-lg-4 d-lg-flex justify-content-lg-end">
-          <RouterLink class="btn btn-success btn-lg" to="/recycling-guide">
-            Open Recycling Guide
-          </RouterLink>
+        <div class="col-12 col-lg-5 d-flex flex-column flex-sm-row flex-lg-column align-items-sm-center align-items-lg-end gap-3">
+          <OfflinePhoneIllustration class="page-intro-illustration offline-intro-illustration" />
+          <RouterLink class="btn btn-success btn-lg" to="/recycling-guide">Open Recycling Guide</RouterLink>
         </div>
       </div>
 
