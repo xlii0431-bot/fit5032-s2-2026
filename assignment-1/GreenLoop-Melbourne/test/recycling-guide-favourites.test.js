@@ -55,6 +55,8 @@ describe('Recycling Guide favourites', () => {
     wrapper = mount(RecyclingGuideView, { global: { plugins: [router] } })
     await flushPromises()
 
+    expect(wrapper.find('.waste-sorting-illustration').exists()).toBe(true)
+
     const buttons = wrapper.findAll('.favourite-toggle')
     expect(buttons[0].text()).toBe('Remove Favourite')
     expect(buttons[0].attributes('aria-pressed')).toBe('true')

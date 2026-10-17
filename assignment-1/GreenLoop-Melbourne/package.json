@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test test/location.test.js test/innovations.test.js && vitest run test/accessibility.test.js test/navigation.test.js test/recycling-guide-favourites.test.js test/favourites-view.test.js test/impact-calculator-view.test.js test/home-account.test.js test/offline-guide.test.js test/analytics-pdf.test.js test/interactive-data-table.test.js test/interactive-data-pdf.test.js",
+    "test": "node --test test/location.test.js test/innovations.test.js && vitest run test/accessibility.test.js test/navigation.test.js test/recycling-guide-favourites.test.js test/favourites-view.test.js test/impact-calculator-view.test.js test/home-account.test.js test/offline-guide.test.js test/analytics-pdf.test.js test/interactive-data-table.test.js test/interactive-data-pdf.test.js test/sensory-guide.test.js",
     "test:rules": "firebase emulators:exec --only firestore \"node --test test/firestore.rules.test.js\""
   },
   "dependencies": {

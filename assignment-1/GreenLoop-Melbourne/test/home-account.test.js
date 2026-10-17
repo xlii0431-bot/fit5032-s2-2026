@@ -42,6 +42,7 @@ afterEach(() => {
   wrapper = undefined
   authState.user = null
   document.body.innerHTML = ''
+  localStorage.clear()
 })
 
 describe('homepage feature navigation', () => {
@@ -64,6 +65,7 @@ describe('homepage feature navigation', () => {
       expect(router.resolve(path).matched).toHaveLength(1),
     )
     expect(wrapper.get('.hero-primary').attributes('href')).toBe('/recycling-guide')
+    expect(wrapper.find('.recycling-orbit-illustration').exists()).toBe(true)
   })
 })
 
@@ -96,5 +98,18 @@ describe('account dropdown', () => {
     await mountNavbar({ uid: 'admin-1', username: 'GreenLoop Admin', role: 'admin' })
     expect(wrapper.get('#accountDropdown').text()).toContain('Administrator')
     expect(wrapper.get('#accountDropdown a[href="/admin"]').text()).toContain('Admin Dashboard')
+  })
+
+  it('keeps the preferences opener available and restores focus after saving', async () => {
+    await mountNavbar(null)
+    const opener = wrapper.get('#accountDropdown button.account-action')
+    await opener.trigger('click')
+    document.querySelector('#colour-scheme-dark').click()
+    document.querySelector('.save-preferences').click()
+    await wrapper.vm.$nextTick()
+
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(wrapper.get('#accountDropdown').isVisible()).toBe(true)
+    expect(document.activeElement).toBe(opener.element)
   })
 })

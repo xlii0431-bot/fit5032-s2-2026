@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import ImpactCalculatorView from '../src/views/ImpactCalculatorView.vue'
+import EarthLeavesIllustration from '../src/components/illustrations/EarthLeavesIllustration.vue'
 
 let wrapper
 
@@ -29,6 +30,7 @@ describe('Environmental Impact Calculator view', () => {
     expect(wrapper.text()).toContain('0.33')
     expect(wrapper.text()).toContain('31.20')
     expect(wrapper.find('.impact-chart[role="img"]').exists()).toBe(true)
+    expect(wrapper.findComponent(EarthLeavesIllustration).exists()).toBe(true)
   })
 
   it('updates all results for another supported WARM material', async () => {

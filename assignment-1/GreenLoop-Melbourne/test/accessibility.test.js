@@ -91,6 +91,7 @@ describe('major GreenLoop interfaces', () => {
     const router = makeRouter(path)
     await router.isReady()
     const wrapper = await mountForAxe(component, { global: { plugins: [router] } })
+    expect(wrapper.find('.recycling-orbit-illustration').exists()).toBe(true)
     await expectNoAxeViolations(wrapper)
   })
 
@@ -139,6 +140,7 @@ describe('major GreenLoop interfaces', () => {
         },
       },
     })
+    expect(wrapper.find('.location-route-illustration').exists()).toBe(true)
     await expectNoAxeViolations(wrapper)
   })
 })
