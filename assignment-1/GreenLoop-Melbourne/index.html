@@ -2,6 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (() => {
+        try {
+          const value = JSON.parse(localStorage.getItem('greenloop-accessibility-preferences') || '{}')
+          const selectedTheme = ['light', 'dark', 'system'].includes(value.colorScheme) ? value.colorScheme : 'system'
+          const dark = selectedTheme === 'dark'
+            || (selectedTheme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+          const textSize = ['small', 'normal', 'large', 'extra-large'].includes(value.textSize)
+            ? value.textSize
+            : 'normal'
+          document.documentElement.dataset.colorScheme = dark ? 'dark' : 'light'
+          document.documentElement.dataset.textSize = textSize
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        } catch {
+          const dark = matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.dataset.colorScheme = dark ? 'dark' : 'light'
+          document.documentElement.dataset.textSize = 'normal'
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        }
+      })()
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#198754" />
     <meta

@@ -5,5 +5,7 @@ import './assets/main.css'
 import './utils/pwa'
 import App from './App.vue'
 import router from './router'
+import { initializeAccessibilityPreferences } from './utils/accessibilityPreferences'
 
+initializeAccessibilityPreferences()
 createApp(App).use(router).mount('#app')

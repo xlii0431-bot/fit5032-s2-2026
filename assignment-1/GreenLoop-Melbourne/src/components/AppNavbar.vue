@@ -19,6 +19,7 @@ import {
 } from '@lucide/vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { logoutUser, observeAuthState } from '../utils/auth'
+import AccessibilityPreferences from './AccessibilityPreferences.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -128,7 +129,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <nav ref="navbar" class="navbar greenloop-navbar navbar-expand-xl navbar-dark" aria-label="Main navigation">
+  <nav ref="navbar" class="navbar greenloop-navbar navbar-expand-xxl navbar-dark" aria-label="Main navigation">
     <div class="container">
       <RouterLink class="navbar-brand fw-semibold" to="/">
         <span class="brand-mark" aria-hidden="true"><Recycle :size="18" /></span>
@@ -148,7 +149,7 @@ onUnmounted(() => {
       </button>
 
       <div id="mainNavigation" class="collapse navbar-collapse" @click="closeMobileNavigation">
-        <ul class="navbar-nav main-navigation-links ms-xl-4 me-xl-auto mb-2 mb-xl-0">
+        <ul class="navbar-nav main-navigation-links ms-xxl-4 me-xxl-auto mb-2 mb-xxl-0">
           <li class="nav-item"><RouterLink class="nav-link" to="/">Home</RouterLink></li>
 
           <li class="nav-item dropdown">
@@ -289,7 +290,7 @@ onUnmounted(() => {
           <li class="nav-item"><RouterLink class="nav-link" to="/about">About</RouterLink></li>
         </ul>
 
-        <ul class="navbar-nav account-navigation mb-2 mb-xl-0">
+        <ul class="navbar-nav account-navigation mb-2 mb-xxl-0">
           <li class="nav-item dropdown">
             <button
               id="accountMenu"
@@ -367,6 +368,7 @@ onUnmounted(() => {
               </template>
 
               <li v-else><span class="dropdown-item-text">Loading account…</span></li>
+              <AccessibilityPreferences />
             </ul>
           </li>
         </ul>
