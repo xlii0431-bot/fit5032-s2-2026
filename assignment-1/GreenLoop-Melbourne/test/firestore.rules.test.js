@@ -134,3 +134,24 @@ test('existing profile and rating protections remain active', async () => {
     }),
   )
 })
+
+test('only administrators can list user profiles while authenticated users can read rating aggregates', async () => {
+  await testEnvironment.withSecurityRulesDisabled(async (context) => {
+    const database = context.firestore()
+    await setDoc(doc(database, 'users/admin-user'), { username: 'Admin', email: 'admin@example.com', role: 'admin', createdAt: new Date() })
+    await setDoc(doc(database, 'users/standard-user'), { username: 'User', email: 'user@example.com', role: 'user', createdAt: new Date() })
+    await setDoc(doc(database, 'locations/location-one/ratings/rater'), { rating: 4, userId: 'rater', createdAt: new Date(), updatedAt: new Date() })
+  })
+
+  const adminDatabase = testEnvironment.authenticatedContext('admin-user').firestore()
+  const userDatabase = testEnvironment.authenticatedContext('standard-user').firestore()
+  const visitorDatabase = testEnvironment.unauthenticatedContext().firestore()
+
+  const profiles = await assertSucceeds(getDocs(collection(adminDatabase, 'users')))
+  assert.equal(profiles.size >= 2, true)
+  await assertFails(getDocs(collection(userDatabase, 'users')))
+  await assertFails(getDocs(collection(visitorDatabase, 'users')))
+  const ratings = await assertSucceeds(getDocs(collection(userDatabase, 'locations/location-one/ratings')))
+  assert.equal(ratings.size >= 1, true)
+  await assertFails(getDocs(collection(visitorDatabase, 'locations/location-one/ratings')))
+})

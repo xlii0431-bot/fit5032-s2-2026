@@ -10,9 +10,12 @@ import {
 } from 'chart.js'
 import { Bar, Doughnut } from 'vue-chartjs'
 import { Download, FileText } from '@lucide/vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { recyclingItems } from '../data/recyclingItems'
+import { recyclingLocations } from '../data/recyclingLocations'
 import { summarizeRecyclingItems } from '../utils/analytics'
+import { observeCommunityRatingAnalytics } from '../utils/communityAnalytics'
+import { observeLocationRatings } from '../utils/ratings'
 import { createCsvContent, downloadCsv } from '../utils/csv'
 import { useAccessibilityPreferences } from '../utils/accessibilityPreferences'
 import { chartSurfacePlugin, getChartFontSize } from '../utils/chartPreferences'
@@ -25,6 +28,11 @@ const categoryChart = ref(null)
 const pathwayChart = ref(null)
 const isExportingPdf = ref(false)
 const exportError = ref('')
+const communityRatings = ref([])
+const communityRatingsLoading = ref(true)
+const communityRatingsError = ref('')
+const ratingMetric = ref('count')
+let stopCommunityRatings = null
 const { preferences, effectiveReduceMotion, effectiveColorScheme } = useAccessibilityPreferences()
 const chartFontSize = computed(() => getChartFontSize(preferences.textSize))
 const chartTextColor = computed(() => preferences.highContrast
@@ -97,6 +105,39 @@ const doughnutOptions = computed(() => ({
     tooltip: { titleFont: { size: chartFontSize.value }, bodyFont: { size: chartFontSize.value } },
   },
 }))
+const communityRatingsChartData = computed(() => ({
+  labels: communityRatings.value.map((location) => location.name),
+  datasets: [{
+    label: ratingMetric.value === 'count' ? 'Community rating count' : 'Average rating (out of 5)',
+    data: communityRatings.value.map((location) => ratingMetric.value === 'count' ? location.count : location.average),
+    backgroundColor: '#198754',
+    borderColor: '#0b4f30',
+    borderWidth: 1,
+  }],
+}))
+const communityRatingsOptions = computed(() => ({
+  ...chartOptions.value,
+  scales: {
+    x: { ticks: { color: chartTextColor.value, font: { size: chartFontSize.value } }, grid: { color: chartGridColor.value } },
+    y: { beginAtZero: true, max: ratingMetric.value === 'average' ? 5 : undefined, ticks: { precision: ratingMetric.value === 'count' ? 0 : 1, color: chartTextColor.value, font: { size: chartFontSize.value } }, grid: { color: chartGridColor.value } },
+  },
+}))
+
+onMounted(() => {
+  stopCommunityRatings = observeCommunityRatingAnalytics(
+    recyclingLocations,
+    observeLocationRatings,
+    (ratings) => {
+      communityRatings.value = ratings
+      communityRatingsLoading.value = false
+    },
+    () => {
+      communityRatingsError.value = 'Live community ratings could not be loaded. Your account may not have permission or the network may be unavailable.'
+      communityRatingsLoading.value = false
+    },
+  )
+})
+onUnmounted(() => stopCommunityRatings?.())
 
 function exportCsv() {
   const columns = [
@@ -172,6 +213,39 @@ async function exportPdf() {
         GreenLoop's local JavaScript dataset. These charts describe application content only; they
         are not Melbourne recycling volumes, participation rates or environmental outcomes.
       </div>
+
+      <section class="card border-0 shadow-sm p-4 mb-4" aria-labelledby="live-ratings-heading">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+          <div>
+            <h2 id="live-ratings-heading" class="h4">Live community ratings</h2>
+            <p class="text-secondary mb-0">Privacy-safe aggregates loaded in real time from Firestore location ratings. No user identifiers are displayed.</p>
+          </div>
+          <div>
+            <label class="form-label" for="rating-metric">Chart measure</label>
+            <select id="rating-metric" v-model="ratingMetric" class="form-select">
+              <option value="count">Rating count</option>
+              <option value="average">Average rating</option>
+            </select>
+          </div>
+        </div>
+        <p v-if="communityRatingsLoading" class="mt-3" role="status">Loading live rating aggregates…</p>
+        <p v-else-if="communityRatingsError" class="alert alert-warning mt-3 mb-0" role="alert">{{ communityRatingsError }}</p>
+        <p v-else-if="communityRatings.every((location) => location.count === 0)" class="alert alert-info mt-3 mb-0" role="status">No community ratings have been submitted yet.</p>
+        <template v-else>
+          <div class="chart-container mt-3" role="img" :aria-label="`Community ratings chart showing ${communityRatings.map((location) => `${location.name}: ${location.count} ratings, average ${location.average}`).join('; ')}`">
+            <Bar :data="communityRatingsChartData" :options="communityRatingsOptions" aria-hidden="true" />
+          </div>
+          <div class="table-responsive mt-3">
+            <table class="table table-sm mb-0">
+              <caption>Accessible summary of live Firestore community rating aggregates</caption>
+              <thead><tr><th scope="col">Location</th><th scope="col">Suburb</th><th scope="col">Average</th><th scope="col">Ratings</th></tr></thead>
+              <tbody><tr v-for="location in communityRatings" :key="location.id"><th scope="row">{{ location.name }}</th><td>{{ location.suburb }}</td><td>{{ location.count ? location.average.toFixed(1) : 'Not rated' }}</td><td>{{ location.count }}</td></tr></tbody>
+            </table>
+          </div>
+        </template>
+      </section>
+
+      <h2 class="h3">Educational guide coverage</h2>
 
       <fieldset class="card border-0 shadow-sm p-4 mb-4">
         <legend class="h2 fs-5 float-none w-auto px-1">Filter categories</legend>

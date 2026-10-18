@@ -1,16 +1,39 @@
 <script setup>
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js'
+import { Doughnut } from 'vue-chartjs'
 import { computed, onMounted, ref } from 'vue'
 import { events } from '../data/events'
 import { recyclingItems } from '../data/recyclingItems'
 import { resources } from '../data/resources'
 import { getAllUserProfiles } from '../utils/auth'
+import { useAccessibilityPreferences } from '../utils/accessibilityPreferences'
+import { chartSurfacePlugin, getChartFontSize } from '../utils/chartPreferences'
+import { summarizeUserRoles } from '../utils/adminAnalytics'
+
+ChartJS.register(ArcElement, Legend, Tooltip, chartSurfacePlugin)
 
 const registeredUsers = ref([])
 const isLoading = ref(true)
 const loadError = ref('')
+const roleCounts = computed(() => summarizeUserRoles(registeredUsers.value))
+const { preferences, effectiveReduceMotion, effectiveColorScheme } = useAccessibilityPreferences()
+const roleChartData = computed(() => ({ labels: ['Administrators', 'Standard users'], datasets: [{ data: [roleCounts.value.admin, roleCounts.value.user], backgroundColor: ['#0b4f30', '#58a96f'], borderColor: '#ffffff', borderWidth: 2 }] }))
+const roleChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: effectiveReduceMotion.value ? false : undefined,
+  plugins: {
+    greenloopSurface: { color: effectiveColorScheme.value === 'dark' ? '#19231d' : '#ffffff' },
+    legend: { position: 'bottom', labels: { color: effectiveColorScheme.value === 'dark' ? '#edf5ef' : '#243229', font: { size: getChartFontSize(preferences.textSize) } } },
+  },
+}))
 
-const summaryCards = computed(() => [
-  { label: 'Total Registered Users', value: registeredUsers.value.length },
+const userSummaryCards = computed(() => [
+  { label: 'Total Registered Users', value: roleCounts.value.total },
+  { label: 'Administrators', value: roleCounts.value.admin },
+  { label: 'Standard Users', value: roleCounts.value.user },
+])
+const contentSummaryCards = computed(() => [
   { label: 'Total Recycling Items', value: recyclingItems.length },
   { label: 'Total Resources', value: resources.length },
   { label: 'Total Events', value: events.length },
@@ -19,8 +42,10 @@ const summaryCards = computed(() => [
 onMounted(async () => {
   try {
     registeredUsers.value = await getAllUserProfiles()
-  } catch {
-    loadError.value = 'Registered users could not be loaded. Check the Firestore rules and try again.'
+  } catch (error) {
+    loadError.value = error?.code === 'permission-denied'
+      ? 'Permission denied. Only an authorised administrator can load user summaries.'
+      : 'Registered users could not be loaded. Check your connection and try again.'
   } finally {
     isLoading.value = false
   }
@@ -34,13 +59,36 @@ onMounted(async () => {
         <div class="col-12 col-lg-9 col-xl-8">
           <h1>Admin Dashboard</h1>
           <p class="lead">
-            Review a simple overview of GreenLoop Melbourne's client-side application data.
+            Review authorised Firestore user profiles, role totals and a summary of GreenLoop’s bundled application content.
           </p>
         </div>
       </div>
 
-      <div class="row g-3 mt-1 mb-5">
-        <div v-for="card in summaryCards" :key="card.label" class="col-12 col-sm-6 col-xl-3">
+      <div v-if="!isLoading && !loadError" class="row g-3 mt-1 mb-4" aria-label="User account totals">
+        <div v-for="card in userSummaryCards" :key="card.label" class="col-12 col-sm-4">
+          <div class="card h-100 border-0 shadow-sm"><div class="card-body p-4"><p class="text-secondary mb-2">{{ card.label }}</p><p class="display-6 fw-semibold text-success mb-0">{{ card.value }}</p></div></div>
+        </div>
+      </div>
+
+      <section v-if="!isLoading && !loadError && registeredUsers.length" class="card border-0 shadow-sm mb-4" aria-labelledby="role-distribution-heading">
+        <div class="card-body p-4">
+          <h2 id="role-distribution-heading" class="h4">User role distribution</h2>
+          <p class="text-secondary">Aggregate Firestore profile counts; this chart does not expose account details.</p>
+          <div class="row g-4 align-items-center">
+            <div class="col-12 col-lg-6"><div class="admin-role-chart mx-auto" role="img" :aria-label="`${roleCounts.admin} administrators and ${roleCounts.user} standard users`"><Doughnut :data="roleChartData" :options="roleChartOptions" aria-hidden="true" /></div></div>
+            <div class="col-12 col-lg-6">
+              <table class="table table-sm mb-0">
+                <caption>Accessible user role totals</caption>
+                <thead><tr><th scope="col">Role</th><th scope="col">Profiles</th></tr></thead>
+                <tbody><tr><th scope="row">Administrator</th><td>{{ roleCounts.admin }}</td></tr><tr><th scope="row">Standard user</th><td>{{ roleCounts.user }}</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="row g-3 mt-1 mb-5" aria-label="Application content totals">
+        <div v-for="card in contentSummaryCards" :key="card.label" class="col-12 col-sm-4">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body p-4">
               <p class="text-secondary mb-2">{{ card.label }}</p>
@@ -89,3 +137,7 @@ onMounted(async () => {
     </div>
   </section>
 </template>
+
+<style scoped>
+.admin-role-chart { width: min(100%, 14rem); height: 14rem; }
+</style>
