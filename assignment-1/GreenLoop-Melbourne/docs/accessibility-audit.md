@@ -1,8 +1,8 @@
 # GreenLoop Melbourne WCAG 2.1 AA Accessibility Audit
 
-Date: 16 October 2026
+Date: 18 October 2026
 
-Scope: Login, registration, Google Sign-In, navigation, event registration, recycling and resource filters, interactive data tables, Share Email, Recycling Location Finder, ratings, application shell, and shared cards.
+Scope: all registered routes, with focused browser and source review of Login, Register, navigation, Accessibility Preferences, Recycling Analytics, Admin Dashboard, Offline Guide, Impact Calculator, data tables, Share Email, Recycling Location Finder, and shared forms/cards.
 
 This review targets WCAG 2.1 Level A and AA. Automated checks can identify only a subset of accessibility problems, so a passing axe result is not a claim of complete WCAG conformance.
 
@@ -26,6 +26,9 @@ This review targets WCAG 2.1 Level A and AA. Automated checks can identify only 
 | The map’s markers are pointer-oriented and Leaflet is a third-party widget. | 1.1.1 Non-text Content (A), 2.1.1 Keyboard (A), 2.4.6 Headings and Labels (AA) | Added map instructions for assistive technology. Every location, selection action, accepted-material list, source link, geolocation action, route action, distance and duration is also available in normal keyboard-accessible HTML outside the map. | Location Finder axe scan uses the text-equivalent interface; real Leaflet keyboard testing remains required. |
 | A newly opened event form was scrolled into view but did not receive focus. | 2.4.3 Focus Order (A) | The registration section receives programmatic focus after opening, and smooth scrolling respects reduced-motion preference. | Source inspection; keyboard test required. |
 | Small-screen spacing and result-header wrapping could cause avoidable crowding. | 1.4.10 Reflow (AA) | Reduced mobile section padding, allowed result headers to wrap, retained Bootstrap responsive grids, and kept tables in labelled horizontal-scroll regions. | Login was checked at a 320 CSS-pixel viewport with no document-level horizontal overflow. Authenticated pages and 200% zoom still require manual checks. |
+| Opening Accessibility Preferences left the application and an open Account menu keyboard-accessible behind the modal. | 2.1.1 Keyboard (A), 2.4.3 Focus Order (A), 4.1.2 Name, Role, Value (A) | After focus enters the teleported dialog, the `#app` root is made `inert` and removed from the accessibility tree. Closing removes both states before restoring focus to the opener. Reset remains inside the modal. | New regression test verifies inert/`aria-hidden`, dialog focus, restoration, persistence, Escape and Save behaviour. |
+| Canvas charts did not all expose equivalent live data. | 1.1.1 Non-text Content (A), 1.3.1 Info and Relationships (A) | Firestore rating and admin role charts now include concise text alternatives plus semantic data tables; existing analytics and impact charts retain numerical summaries. | Source review and component/business-logic tests; screen-reader timing remains manual. |
+| Event registration buttons referenced a conditional form that was absent from the accessibility tree. | 4.1.2 Name, Role, Value (A) | Removed the premature `aria-controls` relationship. Buttons retain event-specific accessible names and the created registration region receives focus. Past events are labelled and their controls are disabled. | Expanded axe scan for Community Events passes; event-expiry tests cover past, current-day and future dates. |
 
 ## Automated verification
 
@@ -39,6 +42,14 @@ This review targets WCAG 2.1 Level A and AA. Automated checks can identify only 
 - The test configuration checks rules tagged WCAG 2 A and AA.
 - Colour contrast is disabled in the jsdom axe run because jsdom does not calculate rendered colours and layout reliably. Contrast therefore remains a manual verification item.
 - Existing Haversine, filtering, sorting, and OSRM response tests continue to run before axe tests.
+- Current run on 18 October 2026: 20 Node tests and 54 Vitest tests passed. Axe coverage now also includes Community Events and the administrator dashboard. The axe suite remains a jsdom component check, not a substitute for a rendered-browser audit.
+
+## Rendered-browser evidence (18 October 2026)
+
+- The production build was served locally and inspected in the available in-app Chromium surface at `1280px` wide.
+- The Login page exposed a `main` landmark, skip link, labelled email/password fields, native buttons, an accessible social-login name, Register link, navbar and Guide launcher in the browser accessibility tree.
+- A rendered screenshot confirmed that the form, illustration and actions were not clipped at that viewport.
+- The available automation surface did not provide script injection, viewport emulation, zoom controls or an authenticated Firebase session. Consequently, real-browser axe, dark/high-contrast, 320px, 200% zoom, protected-route and admin checks were **not** performed and are not claimed.
 
 ## Remaining manual checks
 
@@ -47,7 +58,7 @@ The following must be completed before claiming WCAG 2.1 AA conformance:
 1. Test complete workflows with current VoiceOver/Safari and NVDA/Firefox or NVDA/Chrome, including Firebase and Google popup errors.
 2. Keyboard-test every page, Bootstrap mobile menu, Leaflet zoom controls/popups, rating buttons, modal-style Google popup return focus, table scrolling, and validation recovery.
 3. Verify every foreground/background and focus-indicator state with a browser contrast analyser, including Bootstrap disabled, hover, active, alert, badge, and Leaflet-generated styles.
-4. Test at a 320 CSS-pixel viewport and at 200% browser zoom with real content and authenticated/admin states. Confirm no two-dimensional scrolling except data tables and the map.
+4. Test every route at a 320 CSS-pixel viewport and at 200% browser zoom in normal, dark, high-contrast and Extra Large Text combinations. Confirm no two-dimensional scrolling except intentionally scrollable tables and the map.
 5. Check browser text-spacing overrides against WCAG 1.4.12 and confirm no clipping.
 6. Confirm route changes and dynamic status messages are announced once, in a useful order, across supported screen readers.
 7. Test geolocation permission denied/unavailable/timeout and OSRM failure states with assistive technology.
