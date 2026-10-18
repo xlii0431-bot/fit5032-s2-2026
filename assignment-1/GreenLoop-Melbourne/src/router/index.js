@@ -14,6 +14,7 @@ import AnalyticsView from '../views/AnalyticsView.vue'
 import FavouritesView from '../views/FavouritesView.vue'
 import ImpactCalculatorView from '../views/ImpactCalculatorView.vue'
 import OfflineGuideView from '../views/OfflineGuideView.vue'
+import OfflineRecyclingGuideView from '../views/OfflineRecyclingGuideView.vue'
 import { getCurrentUser, getCurrentUserProfile } from '../utils/auth'
 
 const router = createRouter({
@@ -86,6 +87,12 @@ const router = createRouter({
       component: OfflineGuideView,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/offline-recycling-guide',
+      name: 'offline-recycling-guide',
+      component: OfflineRecyclingGuideView,
+      meta: { publicOffline: true },
+    },
     { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true } },
     {
       path: '/register',
@@ -104,6 +111,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+  if (to.meta.publicOffline) return true
   const currentUser = await getCurrentUser()
 
   if (to.meta.guestOnly && currentUser) return { name: 'home' }

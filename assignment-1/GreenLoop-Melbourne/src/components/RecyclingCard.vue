@@ -8,6 +8,7 @@ defineProps({
   recyclable: { type: Boolean, required: true },
   disposal: { type: String, required: true },
   description: { type: String, required: true },
+  whyItMatters: { type: String, required: true },
   location: { type: Object, default: null },
   favourite: { type: Boolean, default: false },
   favouritesLoading: { type: Boolean, default: false },
@@ -30,8 +31,13 @@ defineEmits(['toggle-favourite'])
       <p class="small text-success fw-semibold text-uppercase mb-2">{{ category }}</p>
       <p class="card-text">{{ description }}</p>
 
-      <div class="mt-auto pt-2 border-top">
-        <p class="fw-semibold mb-1">Disposal guidance</p>
+      <div class="mt-2 pt-3 border-top">
+        <p class="fw-semibold mb-1">Why it matters</p>
+        <p class="card-text mb-0">{{ whyItMatters }}</p>
+      </div>
+
+      <div class="mt-auto pt-3 border-top">
+        <p class="fw-semibold mb-1">How to dispose of it</p>
         <p class="card-text mb-0">{{ disposal }}</p>
       </div>
 

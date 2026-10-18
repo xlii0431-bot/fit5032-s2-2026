@@ -67,6 +67,14 @@ describe('GreenLoop navigation destinations', () => {
     }
   })
 
+  it('keeps the static offline guide public without weakening other route guards', () => {
+    const offlineRoute = router.resolve('/offline-recycling-guide')
+    expect(offlineRoute.matched).toHaveLength(1)
+    expect(offlineRoute.meta.publicOffline).toBe(true)
+    expect(offlineRoute.meta.requiresAuth).not.toBe(true)
+    expect(router.resolve('/recycling-guide').meta.requiresAuth).toBe(true)
+  })
+
   it('keeps only one dropdown open when switching from Recycle to Discover', async () => {
     await router.push('/')
     await router.isReady()

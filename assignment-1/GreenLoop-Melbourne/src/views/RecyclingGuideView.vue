@@ -27,7 +27,7 @@ const filteredItems = computed(() => {
   const normalisedQuery = searchQuery.value.trim().toLowerCase()
 
   return recyclingItems.filter((item) => {
-    const searchableText = `${item.name} ${item.description} ${item.disposal}`.toLowerCase()
+    const searchableText = `${item.name} ${item.description} ${item.whyItMatters} ${item.disposal}`.toLowerCase()
     const matchesSearch = searchableText.includes(normalisedQuery)
     const matchesCategory =
       selectedCategory.value === '' || item.category === selectedCategory.value
@@ -173,6 +173,7 @@ onUnmounted(() => stopObservingFavourites?.())
             :recyclable="item.recyclable"
             :disposal="item.disposal"
             :description="item.description"
+            :why-it-matters="item.whyItMatters"
             :location="item.location"
             :favourite="isFavourite(item.id)"
             :favourites-loading="favouritesLoading"
