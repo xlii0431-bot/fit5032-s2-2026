@@ -2,6 +2,7 @@
 import { computed, nextTick, reactive, ref } from 'vue'
 import { events } from '../data/events'
 import CommunityGardenIllustration from '../components/illustrations/CommunityGardenIllustration.vue'
+import { isEventPast } from '../utils/events'
 
 const registrationSection = ref(null)
 const registrationForm = ref(null)
@@ -64,7 +65,9 @@ function validateAttendees() {
 }
 
 function validateEvent() {
-  return selectedEvent.value ? '' : 'Please select an event.'
+  if (!selectedEvent.value) return 'Please select an event.'
+  if (isEventPast(selectedEvent.value.dateISO)) return 'Registration has closed for this past event.'
+  return ''
 }
 
 function validateField(fieldName) {
@@ -97,6 +100,8 @@ function clearValidationState() {
 }
 
 async function selectEvent(eventId) {
+  const event = events.find((item) => item.id === eventId)
+  if (!event || isEventPast(event.dateISO)) return
   form.eventId = eventId
   isRegistrationVisible.value = true
   successMessage.value = ''
@@ -155,10 +160,11 @@ async function handleSubmit() {
           <article class="card h-100 shadow-sm border-success-subtle">
             <div class="card-body d-flex flex-column p-4">
               <h2 class="h5 card-title">{{ event.title }}</h2>
+              <span v-if="isEventPast(event.dateISO)" class="badge text-bg-secondary align-self-start mb-2">Past event</span>
               <dl class="mb-3">
                 <div class="mb-2">
                   <dt class="d-inline">Date:</dt>
-                  <dd class="d-inline ms-1">{{ event.date }}</dd>
+                  <dd class="d-inline ms-1"><time :datetime="event.dateISO">{{ event.date }}</time></dd>
                 </div>
                 <div>
                   <dt class="d-inline">Location:</dt>
@@ -169,10 +175,11 @@ async function handleSubmit() {
               <button
                 class="btn btn-success align-self-start"
                 type="button"
-                aria-controls="event-registration"
+                :disabled="isEventPast(event.dateISO)"
+                :aria-label="isEventPast(event.dateISO) ? `Registration closed for ${event.title}` : `Register for ${event.title}`"
                 @click="selectEvent(event.id)"
               >
-                Register
+                {{ isEventPast(event.dateISO) ? 'Registration closed' : 'Register' }}
               </button>
             </div>
           </article>
@@ -305,8 +312,8 @@ async function handleSubmit() {
                       @change="handleInput('eventId')"
                     >
                       <option value="">Choose an event</option>
-                      <option v-for="event in events" :key="event.id" :value="event.id">
-                        {{ event.title }}
+                      <option v-for="event in events" :key="event.id" :value="event.id" :disabled="isEventPast(event.dateISO)">
+                        {{ event.title }}{{ isEventPast(event.dateISO) ? ' — registration closed' : '' }}
                       </option>
                     </select>
                     <div

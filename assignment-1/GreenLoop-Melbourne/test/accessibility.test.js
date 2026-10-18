@@ -4,8 +4,17 @@ import { mount } from '@vue/test-utils'
 import axe from 'axe-core'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
+vi.mock('vue-chartjs', () => ({
+  Bar: { template: '<div aria-hidden="true"></div>' },
+  Doughnut: { template: '<div aria-hidden="true"></div>' },
+}))
+
 vi.mock('../src/utils/auth', () => ({
   getCurrentUser: vi.fn().mockResolvedValue({ uid: 'test-user' }),
+  getAllUserProfiles: vi.fn().mockResolvedValue([
+    { uid: 'admin', username: 'Admin', email: 'admin@example.com', role: 'admin' },
+    { uid: 'user', username: 'User', email: 'user@example.com', role: 'user' },
+  ]),
   loginUser: vi.fn(),
   loginWithGoogle: vi.fn(),
   logoutUser: vi.fn(),
@@ -34,6 +43,8 @@ import LocationFinderView from '../src/views/LocationFinderView.vue'
 import LoginView from '../src/views/LoginView.vue'
 import RegisterView from '../src/views/RegisterView.vue'
 import ShareEmailView from '../src/views/ShareEmailView.vue'
+import EventsView from '../src/views/EventsView.vue'
+import AdminDashboardView from '../src/views/AdminDashboardView.vue'
 
 const mountedWrappers = []
 
@@ -112,6 +123,29 @@ describe('major GreenLoop interfaces', () => {
       },
     })
     await expectNoAxeViolations(wrapper)
+  })
+
+  it.each([
+    ['events page', EventsView, '/events'],
+    ['administrator dashboard', AdminDashboardView, '/admin'],
+  ])('has no detectable WCAG A/AA axe violations in the %s', async (_name, component, path) => {
+    const router = makeRouter(path)
+    await router.isReady()
+    const wrapper = await mountForAxe(component, {
+      global: { plugins: [router], stubs: { Doughnut: true } },
+    })
+    await vi.waitFor(() => expect(wrapper.text()).not.toContain('Loading registered users'))
+    await expectNoAxeViolations(wrapper)
+  })
+
+  it('labels past events and prevents expired registration while leaving future registration available', async () => {
+    const router = makeRouter('/events')
+    await router.isReady()
+    const wrapper = await mountForAxe(EventsView, { global: { plugins: [router] } })
+    const buttons = wrapper.findAll('article button')
+    expect(buttons.filter((button) => button.attributes('disabled') !== undefined)).toHaveLength(2)
+    expect(buttons.filter((button) => button.text() === 'Register')).toHaveLength(1)
+    expect(wrapper.findAll('.badge').map((badge) => badge.text())).toEqual(['Past event', 'Past event'])
   })
 
   it('has no detectable WCAG A/AA axe violations in the email sharing form', async () => {

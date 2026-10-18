@@ -2,6 +2,7 @@ export const events = [
   {
     id: 1,
     title: 'Community Recycling Workshop',
+    dateISO: '2026-09-12',
     date: 'Saturday, 12 September 2026',
     location: 'Clayton Community Centre',
     description:
@@ -10,6 +11,7 @@ export const events = [
   {
     id: 2,
     title: 'E-Waste Drop-off Day',
+    dateISO: '2026-10-04',
     date: 'Sunday, 4 October 2026',
     location: 'Melbourne Town Hall',
     description:
@@ -18,6 +20,7 @@ export const events = [
   {
     id: 3,
     title: 'Zero Waste Living Workshop',
+    dateISO: '2026-10-24',
     date: 'Saturday, 24 October 2026',
     location: 'Monash Civic Centre, Glen Waverley',
     description:
