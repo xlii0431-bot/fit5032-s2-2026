@@ -96,6 +96,21 @@ describe('sensory-friendly preferences', () => {
     expect(document.activeElement).toBe(trigger.element)
   })
 
+  it('makes application background inert while the modal is open and restores it on close', async () => {
+    const appRoot = document.createElement('div')
+    appRoot.id = 'app'
+    document.body.appendChild(appRoot)
+    wrapper = mount(AccessibilityPreferences, { attachTo: appRoot })
+    await wrapper.get('button.account-action').trigger('click')
+    expect(appRoot.inert).toBe(true)
+    expect(appRoot.getAttribute('aria-hidden')).toBe('true')
+    expect(document.activeElement.closest('[role="dialog"]')).toBeTruthy()
+    document.querySelector('[aria-label="Close accessibility preferences"]').click()
+    await wrapper.vm.$nextTick()
+    expect(appRoot.inert).toBe(false)
+    expect(appRoot.hasAttribute('aria-hidden')).toBe(false)
+  })
+
   it('persists preferences, closes after Save and restores focus to the opener', async () => {
     wrapper = mount(AccessibilityPreferences, { attachTo: document.body })
     const trigger = wrapper.get('button.account-action')

@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, reactive, ref } from 'vue'
+import { nextTick, onBeforeUnmount, reactive, ref } from 'vue'
 import { Accessibility, RotateCcw, X } from '@lucide/vue'
 import { useAccessibilityPreferences } from '../utils/accessibilityPreferences'
 
@@ -16,6 +16,14 @@ const draft = reactive({
 })
 const statusMessage = ref('')
 
+function setBackgroundInert(value) {
+  const appRoot = document.getElementById('app')
+  if (!appRoot) return
+  appRoot.inert = value
+  if (value) appRoot.setAttribute('aria-hidden', 'true')
+  else appRoot.removeAttribute('aria-hidden')
+}
+
 function syncDraft() {
   draft.motion = preferences.motion
   draft.highContrast = preferences.highContrast
@@ -30,13 +38,17 @@ async function openDialog() {
   isOpen.value = true
   await nextTick()
   dialog.value?.querySelector('input, button')?.focus()
+  setBackgroundInert(true)
 }
 
 async function closeDialog() {
+  setBackgroundInert(false)
   isOpen.value = false
   await nextTick()
   trigger.value?.focus()
 }
+
+onBeforeUnmount(() => setBackgroundInert(false))
 
 async function savePreferences() {
   updatePreferences(draft)
