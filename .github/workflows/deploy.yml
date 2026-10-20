@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: weekly-efolio/xli-library-c3/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: weekly-efolio/xli-library-c3
+
+      - name: Build for GitHub Pages
+        run: npm run build
+        working-directory: weekly-efolio/xli-library-c3
+        env:
+          VITE_BASE_PATH: /fit5032-s2-2026/
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: weekly-efolio/xli-library-c3/dist
